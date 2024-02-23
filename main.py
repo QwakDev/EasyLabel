@@ -1,5 +1,6 @@
 import tkinter as tk
 from source.pen import DrawingCanvas
+import source.files as FILE
 
 
 window = tk.Tk()
@@ -24,9 +25,16 @@ def btn_remove_label_click():
     i = listbox_label.curselection()
     listbox_label.delete(i)
 def btn_save_path_click(): #TODO check if path isValid and change textbox to SAVING TO: or PLEASE WINPUT VALID PATH
-    print('SAVE PATH SAVED')
+    o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
+    print(o)
 def btn_load_path_click():#TODO LOAD FILES PATHS FROM DIR and add them to the list
-    print("path loaded")
+    _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
+    listbox_path.delete(0, tk.END)
+    if _items != False:
+        _n = 1
+        for i in _items:
+            listbox_path.insert(_n, i)
+            _n = _n + 1
 
 ##VIEWS
 window.title("EasyLoop App")
