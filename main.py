@@ -4,8 +4,6 @@ from source.pen import DrawingCanvas
 
 window = tk.Tk()
 ##VARIABLES
-selected_label = None
-selected_item = None
 _saved_num_files = 0
 saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
@@ -41,7 +39,6 @@ frame_main = tk.Frame(window)
 frame_right.pack(side='right')
 frame_main.pack(side='top')
 frame_options.pack(side='bottom')
-var1 = tk.IntVar()
 #MAIN
 canvas = DrawingCanvas(window=frame_main,height=600, width=600)
 #OPTIONS (BOTTOM PANEL)
@@ -54,9 +51,6 @@ btn_load_path = tk.Button(frame_path,text='LOAD_DIR',command=btn_load_path_click
 btn_load_path.pack(side='left')
 
 listbox_path = tk.Listbox(frame_right, width=70)        
-listbox_path.insert(1, "ITEM1")
-listbox_path.insert(2, "ITEM2")
-listbox_path.insert(3, "ITEM3")
 frame_path.pack()
 listbox_path.pack()
 
@@ -70,9 +64,6 @@ btn_add_label = tk.Button(frame_label,text='ADD_LABEL',command=btn_add_label_cli
 btn_add_label.pack(side='left')
 
 listbox_label = tk.Listbox(frame_right, width=70 ,height=4, )
-listbox_label.insert(1, "LABEL1")
-listbox_label.insert(2, "LABEL2")
-listbox_label.insert(3, "LABEL3")
 
 frame_label.pack()
 listbox_label.pack()
@@ -102,7 +93,7 @@ scale_pen_size.pack(side='left')
 
 frame_s= tk.Frame(frame_right)
 btn_next = tk.Button(frame_s, text='SAVE_AND_NEXT',command=btn_next_click)
-checkbox_auto_s = tk.Checkbutton(frame_s, text='AUTO_SAVE',variable=var1, onvalue=True, offvalue=False)
+checkbox_auto_s = tk.Checkbutton(frame_s, text='AUTO_SAVE')
 label_s_num_text = tk.Label(frame_s, text='NUM_FILES_SAVED: ' )
 label_s_num = tk.Label(frame_s, textvariable= str(saved_num_files) )
 
