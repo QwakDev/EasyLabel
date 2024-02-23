@@ -1,37 +1,116 @@
 import tkinter as tk
 from source.pen import DrawingCanvas
 
+
 window = tk.Tk()
+##VARIABLES
+selected_label = None
+selected_item = None
+_saved_num_files = 0
+saved_num_files = tk.StringVar()
+saved_num_files.set(str(_saved_num_files))
+##ACTIONS
+#BUTTONS, LISTS AND VALUES
+def btn_next_click(): #TODO : ADD FILE SAVING METHOD
+    global _saved_num_files, saved_num_files
+    _saved_num_files = _saved_num_files + 1
+    saved_num_files.set(str(_saved_num_files))
+    print(_saved_num_files)
+     
+    window.mainloop()
+def btn_add_label_click():
+    listbox_label.insert(4,text_label.get(1.0, 'end-1c'))
+    text_label.delete(1.0, 'end-1c')
+    text_label.insert('end-1c', 'TYPE NEW LABEL' )
+def btn_remove_label_click():
+    i = listbox_label.curselection()
+    listbox_label.delete(i)
+def btn_save_path_click(): #TODO check if path isValid and change textbox to SAVING TO: or PLEASE WINPUT VALID PATH
+    print('SAVE PATH SAVED')
+def btn_load_path_click():#TODO LOAD FILES PATHS FROM DIR and add them to the list
+    print("path loaded")
+
+##VIEWS
 window.title("EasyLoop App")
-window.geometry('800x600')
+window.geometry('1200x650')
 
-##BUTTONS ACTIONS
-def click_btn_okey():
-    print("OEY!")
-#WINDOW INITK
-ok_btn=tk.Button(window,text='OKEY', command=click_btn_okey, height=1,width=5)
-ok_btn.place(x=10, y=10)
-btn_next = tk.Button(window, text='NEXT')
+frame_options = tk.Frame(window)
+frame_right = tk.Frame(window)
+frame_main = tk.Frame(window)
 
+frame_right.pack(side='right')
+frame_main.pack(side='top')
+frame_options.pack(side='bottom')
 var1 = tk.IntVar()
-text_path = tk.Text(window, height=1, width=50)
-text_name = tk.Text(window, height=1, width=25)
-text_label= tk.Text(window, height=1, width=25)
+#MAIN
+canvas = DrawingCanvas(window=frame_main,height=600, width=600)
+#OPTIONS (BOTTOM PANEL)
+#RIGHT_PANEL
+frame_path = tk.Frame(frame_right)                      
+text_path = tk.Text(frame_path, height=1, width=50)
+text_path.insert('end-1c', 'TYPE DIR PATH FROM WHERE TO LOAD FILES')
+text_path.pack(side='right')
+btn_load_path = tk.Button(frame_path,text='LOAD_DIR',command=btn_load_path_click)
+btn_load_path.pack(side='left')
 
-Lb1 = tk.Listbox(windowl)
-Lb1.insert(1, "Python")
-Lb1.insert(2, "Perl")
-Lb1.insert(3, "C")
-Lb1.insert(4, "PHP")
-Lb1.insert(5, "JSP")
+listbox_path = tk.Listbox(frame_right, width=70)        
+listbox_path.insert(1, "ITEM1")
+listbox_path.insert(2, "ITEM2")
+listbox_path.insert(3, "ITEM3")
+frame_path.pack()
+listbox_path.pack()
 
-c1 = tk.Checkbutton(window, text='Python',variable=var1, onvalue=True, offvalue=False)
-c1.pack()
-btn_next.pack()
-Lb1.pack()
-text_name.pack()
-text_label.pack()
-text_path.pack()
-canvas = DrawingCanvas(window=window,height=600, width=600)
+frame_label = tk.Frame(frame_right)    
+btn_remove_label = tk.Button(frame_label,text='REMOVE_LABEL',command=btn_remove_label_click)
+btn_remove_label.pack(side='right')                 
+text_label = tk.Text(frame_label, height=1, width=25)
+text_label.insert('end-1c', 'TYPE NEW LABEL')
+text_label.pack(side='right')
+btn_add_label = tk.Button(frame_label,text='ADD_LABEL',command=btn_add_label_click)
+btn_add_label.pack(side='left')
+
+listbox_label = tk.Listbox(frame_right, width=70 ,height=4, )
+listbox_label.insert(1, "LABEL1")
+listbox_label.insert(2, "LABEL2")
+listbox_label.insert(3, "LABEL3")
+
+frame_label.pack()
+listbox_label.pack()
+
+frame_s_path = tk.Frame(frame_right)
+text_s_path = tk.Text(frame_s_path, height=1, width=50)
+text_s_path.insert('end-1c', 'TYPE DIR WHERE TO SAVE FILE')
+btn_save_path = tk.Button(frame_s_path,text='SAVE_TO',command=btn_save_path_click)
+
+text_s_path.pack(side='right')
+btn_save_path.pack(side='left')
+frame_s_path.pack()
+
+frame_pen = tk.Frame(frame_right)
+checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
+checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT')
+checkbox_smooth = tk.Checkbutton(frame_pen, text='SMOOTH')
+scale_pen_size = tk.Scale(frame_pen, orient='horizontal')
+
+frame_pen.pack()
+checkbox_highlight.pack(side='left')
+checkbox_auto_fill.pack(side='left')
+checkbox_smooth.pack(side='left')
+scale_pen_size.pack(side='left')
+
+
+
+frame_s= tk.Frame(frame_right)
+btn_next = tk.Button(frame_s, text='SAVE_AND_NEXT',command=btn_next_click)
+checkbox_auto_s = tk.Checkbutton(frame_s, text='AUTO_SAVE',variable=var1, onvalue=True, offvalue=False)
+label_s_num_text = tk.Label(frame_s, text='NUM_FILES_SAVED: ' )
+label_s_num = tk.Label(frame_s, textvariable= str(saved_num_files) )
+
+frame_s.pack()
+label_s_num.pack(side='right')
+label_s_num_text.pack(side='right')
+btn_next.pack(side='left')
+checkbox_auto_s.pack(side='right')
+
 
 window.mainloop()

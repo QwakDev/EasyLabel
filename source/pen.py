@@ -4,16 +4,18 @@ isDrawing = False
 last_x, last_y = 0,0
 pen_color = 'black'
 canvas = None
+pen_size = 0
 
 
 class DrawingCanvas(tk.Canvas):
-    def __init__(self,window , height, width, img=None, thickness=2):
+    def __init__(self,window , height, width, img=None, pen_size=2):
         self.window = window
         self.canvas = tk.Canvas(self.window, bg='white', height=height, width=width)
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self.start_drawing)
         self.canvas.bind("<ButtonRelease-1>", self.stop_drawing)
         self.canvas.bind("<B1-Motion>", self.draw)
+        self.pen_size = pen_size
 
     
     def start_drawing(self, e):
