@@ -27,7 +27,7 @@ def btn_remove_label_click():
 def btn_save_path_click(): #TODO check if path isValid and change textbox to SAVING TO: or PLEASE WINPUT VALID PATH
     o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
     print(o)
-def btn_load_path_click():#TODO LOAD FILES PATHS FROM DIR and add them to the list
+def btn_load_path_click():
     _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
     listbox_path.delete(0, tk.END)
     if _items != False:
