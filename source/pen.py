@@ -1,5 +1,4 @@
 import tkinter as tk
-import cv2 as cv
 from PIL import Image, ImageTk
 import os
 import io
