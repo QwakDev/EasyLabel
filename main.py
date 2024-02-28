@@ -10,25 +10,38 @@ saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUES
-def btn_next_click(): #TODO SAVE FILE, append labels
+def onSelect_lisbox_items(e):#TODO check if it is JPG
+    selection = e.widget.curselection()
+    if e.widget.get(selection[0]) != '':
+        _item_name = e.widget.get(selection[0])
+        img = FILE.GetPicture(text_path.get(1.0, 'end-1c')+ str(_item_name)) 
+        canvas.set_drawing(img)
+    return 0
+def btn_next_click():
     global _saved_num_files, saved_num_files
     _saved_num_files = _saved_num_files + 1
     saved_num_files.set(str(_saved_num_files))
-    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(), 'bt_next_click DEBUG')
-     
+    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()))
     window.mainloop()
-def btn_add_label_click(): #TODO append list of labels in file
+def btn_add_label_click(): 
     listbox_label.insert(4,text_label.get(1.0, 'end-1c'))
     text_label.delete(1.0, 'end-1c')
     text_label.insert('end-1c', 'TYPE NEW LABEL' )
 def btn_remove_label_click():
     i = listbox_label.curselection()
     listbox_label.delete(i)
-def btn_save_path_click(): #TODO check labels and list them out
+def btn_save_path_click():
     o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
     global _saved_num_files, saved_num_files
     _saved_num_files = o
     saved_num_files.set(str(_saved_num_files))
+
+    _labels = FILE.GetLabels(text_s_path.get(1.0, 'end-1c'))
+    listbox_label.delete(0, tk.END)
+    _n = 1
+    for l in _labels[1]:
+        listbox_label.insert(_n, l)
+        _n = _n + 1
 def btn_load_path_click():
     _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
     listbox_path.delete(0, tk.END)
@@ -60,7 +73,8 @@ text_path.pack(side='right')
 btn_load_path = tk.Button(frame_path,text='LOAD_DIR',command=btn_load_path_click)
 btn_load_path.pack(side='left')
 
-listbox_path = tk.Listbox(frame_right, width=70)        
+listbox_path = tk.Listbox(frame_right, width=70)  
+listbox_path.bind('<<ListboxSelect>>', onSelect_lisbox_items)      
 frame_path.pack()
 listbox_path.pack()
 

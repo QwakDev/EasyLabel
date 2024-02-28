@@ -1,6 +1,6 @@
 import tkinter as tk
 import cv2 as cv
-from PIL import Image
+from PIL import Image, ImageTk
 import os
 import io
 
@@ -47,7 +47,12 @@ class DrawingCanvas(tk.Canvas):
         self.image = Image.open(io.BytesIO(ps.encode('utf-8')))
     def get_drawing(self):
         return self.image
-    def load_image(self, imgFilePath):
+    def set_drawing(self, data):
+        self.image = ImageTk.PhotoImage(data)
+        self.canvas.create_image(0,0,image=self.image, anchor='nw')
+
+    def load_image(self, imgFilePath = None, data = None):
+        self.canvas.create_image(image=data)
 
         return 0
 
