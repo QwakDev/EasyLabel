@@ -48,8 +48,9 @@ class DrawingCanvas(tk.Canvas):
     def get_drawing(self):
         return self.image
     def set_drawing(self, data):
-        self.image = ImageTk.PhotoImage(data)
-        self.canvas.create_image(0,0,image=self.image, anchor='nw')
+        self.image = None
+        self.canvas.delete('all')
+        self.canvas.create_image(0,0,image=data, anchor='nw')
 
     def load_image(self, imgFilePath = None, data = None):
         self.canvas.create_image(image=data)

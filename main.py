@@ -10,12 +10,13 @@ saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUES
-def onSelect_lisbox_items(e):#TODO check if it is JPG
+def onSelect_lisbox_items(e):
     selection = e.widget.curselection()
     if e.widget.get(selection[0]) != '':
         _item_name = e.widget.get(selection[0])
         img = FILE.GetPicture(text_path.get(1.0, 'end-1c')+ str(_item_name)) 
         canvas.set_drawing(img)
+        window.mainloop()
     return 0
 def btn_next_click():
     global _saved_num_files, saved_num_files
@@ -45,11 +46,13 @@ def btn_save_path_click():
 def btn_load_path_click():
     _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
     listbox_path.delete(0, tk.END)
+
     if _items != False:
         _n = 1
         for i in _items:
-            listbox_path.insert(_n, i)
-            _n = _n + 1
+            if i[-4:].lower() == '.jpg':
+                listbox_path.insert(_n, i)
+                _n = _n + 1
 
 ##VIEWS
 window.title("EasyLoop App")
@@ -73,7 +76,7 @@ text_path.pack(side='right')
 btn_load_path = tk.Button(frame_path,text='LOAD_DIR',command=btn_load_path_click)
 btn_load_path.pack(side='left')
 
-listbox_path = tk.Listbox(frame_right, width=70)  
+listbox_path = tk.Listbox(frame_right, width=70, exportselection=False)  
 listbox_path.bind('<<ListboxSelect>>', onSelect_lisbox_items)      
 frame_path.pack()
 listbox_path.pack()
@@ -87,7 +90,7 @@ text_label.pack(side='right')
 btn_add_label = tk.Button(frame_label,text='ADD_LABEL',command=btn_add_label_click)
 btn_add_label.pack(side='left')
 
-listbox_label = tk.Listbox(frame_right, width=70 ,height=4, )
+listbox_label = tk.Listbox(frame_right, width=70 ,height=4, exportselection=False )
 
 frame_label.pack()
 listbox_label.pack()

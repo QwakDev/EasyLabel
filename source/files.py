@@ -1,7 +1,7 @@
 import tkinter as tk
 import os
 import cv2 as cv
-from PIL import Image
+from PIL import Image , ImageTk
 import os
 import io
 #TODO LABEL.txt, config.txt, 1.jpg, 2.jpg... 
@@ -26,7 +26,7 @@ def GetLabels(path): # RETURNS: (LIST_OF_LABELS,LIST_OF_ALL_LABELS)
     out[0] = f.read().split(',')
     out[1] = list(set(out[0])) #GETING LIST OF UNIQUE VALUES
     return out
-def GetListOfFiles(path): #TODO Make sure they are files, FUTURE filtering
+def GetListOfFiles(path):
     out = []
     if os.path.isdir(path):
         _listOfFiles = os.listdir(path)
@@ -35,9 +35,9 @@ def GetListOfFiles(path): #TODO Make sure they are files, FUTURE filtering
     else:
         out = False
     return out
-def GetPicture(path):#TODO read img and return it IN THE FUTURE transform
-    return Image.open(path)
-def SetSavingDir(path):#TODO  OR Output of wrong path given
+def GetPicture(path):
+    return ImageTk.PhotoImage(file=path)
+def SetSavingDir(path):
     if os.path.isdir(path):
         if os.path.exists(path + 'Label.txt'):
             return GetNumberOfPictures(path)
