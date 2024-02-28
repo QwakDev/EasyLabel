@@ -10,23 +10,25 @@ saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUES
-def btn_next_click(): #TODO : ADD FILE SAVING METHOD
+def btn_next_click(): #TODO SAVE FILE, append labels
     global _saved_num_files, saved_num_files
     _saved_num_files = _saved_num_files + 1
     saved_num_files.set(str(_saved_num_files))
-    print(_saved_num_files)
+    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(), 'bt_next_click DEBUG')
      
     window.mainloop()
-def btn_add_label_click():
+def btn_add_label_click(): #TODO append list of labels in file
     listbox_label.insert(4,text_label.get(1.0, 'end-1c'))
     text_label.delete(1.0, 'end-1c')
     text_label.insert('end-1c', 'TYPE NEW LABEL' )
 def btn_remove_label_click():
     i = listbox_label.curselection()
     listbox_label.delete(i)
-def btn_save_path_click(): #TODO check if path isValid and change textbox to SAVING TO: or PLEASE WINPUT VALID PATH
+def btn_save_path_click(): #TODO check labels and list them out
     o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
-    print(o)
+    global _saved_num_files, saved_num_files
+    _saved_num_files = o
+    saved_num_files.set(str(_saved_num_files))
 def btn_load_path_click():
     _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
     listbox_path.delete(0, tk.END)

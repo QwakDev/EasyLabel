@@ -1,10 +1,18 @@
 import tkinter as tk
 import os
-
+import cv2 as cv
+from PIL import Image
+import os
+import io
+#TODO LABEL.txt, config.txt, 1.jpg, 2.jpg... 
+def GetNumberOfPictures(path):
+    return len(GetListOfFiles(path)) - 1
 def GetLabels(path):
     out = []
-    return
-def AppendLabelFile(path): #TODO file of labels in .txt matching files in DIR  LABEL1,LABEL2,LABEL3...
+    return out
+def CreateConfigFile():
+    return 0
+def AppendLabelFile(path, label): #TODO file of labels in .txt matching files in DIR  LABEL1,LABEL2,LABEL3...
     return 0
 def GetListOfFiles(path): #TODO Make sure they are files, FUTURE filtering
     out = []
@@ -15,7 +23,7 @@ def GetListOfFiles(path): #TODO Make sure they are files, FUTURE filtering
     else:
         out = False
     return out
-def ReadFile(dir, file):#TODO read img and return it IN THE FUTURE transform
+def ReadPicture(path):#TODO read img and return it IN THE FUTURE transform
     return 0
 def SetSavingDir(path):#TODO  OR Output of wrong path given
     if os.path.isdir(path):
@@ -28,8 +36,10 @@ def SetSavingDir(path):#TODO  OR Output of wrong path given
         os.open(path + 'Label.txt', os.O_CREAT)
         return 0
     
-def SaveFile(data, label): #TODO save img to <x>.btm x=1,2,3... AND append label file with label
+def SaveFile(path, data, label): #TODO save img to <x>.btm x=1,2,3... AND append label file with label
+    name = GetNumberOfPictures(path)
+    data.save(path + str(name) + '.jpg')
+    #AppendLabelFile(path, label)
+
     return 0
 
-
-SetSavingDir('D:\Projects\EasyLabel\data_save_test/')
