@@ -10,10 +10,12 @@ saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUES
-#TODO add options checkboxes on the bottom
-#TODO CREATE LIB for image procesing
+#TODO drawing rect
 #TODO highlight option
-#TODO Saving highlighted area 
+#TODO TEMP file canvas
+#TODO Undo button
+#TODO Saving only highlighted area
+#TODO CREATE LIB for image procesing
 def onSelect_lisbox_items(e):
     selection = e.widget.curselection()
     if e.widget.get(selection[0]) != '':
