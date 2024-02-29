@@ -59,7 +59,8 @@ def btn_load_path_click():
             if i[-4:].lower() == '.jpg':
                 listbox_path.insert(_n, i)
                 _n = _n + 1
-
+def scale_set_pen_size(val):
+    canvas.pen_size = int(val)
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')
@@ -114,7 +115,7 @@ frame_pen = tk.Frame(frame_right)
 checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
 checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT')
 checkbox_smooth = tk.Checkbutton(frame_pen, text='SMOOTH')
-scale_pen_size = tk.Scale(frame_pen, orient='horizontal')
+scale_pen_size = tk.Scale(frame_pen, orient='horizontal', from_=3, to=40,command=scale_set_pen_size)
 
 frame_pen.pack()
 checkbox_highlight.pack(side='left')

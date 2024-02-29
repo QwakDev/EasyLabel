@@ -35,13 +35,22 @@ class DrawingCanvas(tk.Canvas):
 
         if isDrawing:
             x, y = e.x, e.y
-            self.canvas.create_line((last_x, last_y, x, y), fill=pen_color, width=2)
+            #LINE
+            self.canvas.create_line((last_x, last_y, x, y), fill=pen_color, width=self.pen_size)
             last_x, last_y = x, y
+            #CIRCLE
+            r = self.pen_size/2
+            x0 = x - r
+            y0 = y - r
+            x1 = x + r
+            y1 = y + r
+            self.canvas.create_oval(x0, y0, x1, y1, fill=pen_color)
+
 
     def stop_drawing(self, e): #TODO save into temp folder and add return values
         global isDrawing
         isDrawing=False
-
+        #SAVING
         ps = self.canvas.postscript(colormode='color')
         self.image = Image.open(io.BytesIO(ps.encode('utf-8')))
     def get_drawing(self):
