@@ -6,8 +6,10 @@ import io
 isDrawing = False
 last_x, last_y = 0,0
 pen_color = 'black'
+highlight = False
 canvas = None
 pen_size = 0
+drawing_tag = 0
 
 
 class DrawingCanvas(tk.Canvas):
@@ -20,6 +22,8 @@ class DrawingCanvas(tk.Canvas):
         self.canvas.bind("<B1-Motion>", self.draw)
         self.pen_size = pen_size
         self.image = None
+        self.drawingTags = []
+        self.drawings = []
         #if imgFile != None:
         #    self.image= tk.PhotoImage(file=imgFile)
         #    self.canvas.create_image(height, width, image= self.image)
@@ -27,16 +31,20 @@ class DrawingCanvas(tk.Canvas):
 
     
     def start_drawing(self, e):
-        global isDrawing,last_x,last_y
+        global isDrawing,last_x,last_y, drawing_tag
         isDrawing = True
+        drawing_tag = drawing_tag + 1
         last_x, last_y = e.x, e.y
     def draw(self, e):
-        global last_x,last_y, isDrawing
+        global last_x,last_y, isDrawing, drawing_tag
 
         if isDrawing:
             x, y = e.x, e.y
             #LINE
-            self.canvas.create_line((last_x, last_y, x, y), fill=pen_color, width=self.pen_size)
+            d=self.canvas.create_line((last_x, last_y, x, y), fill=pen_color, width=self.pen_size, tags=str(drawing_tag))
+
+            self.drawings.append((drawing_tag,d))
+
             last_x, last_y = x, y
             #CIRCLE
             r = self.pen_size/2
@@ -44,12 +52,13 @@ class DrawingCanvas(tk.Canvas):
             y0 = y - r
             x1 = x + r
             y1 = y + r
-            self.canvas.create_oval(x0, y0, x1, y1, fill=pen_color)
-
+            d=self.canvas.create_oval(x0, y0, x1, y1, fill=pen_color, tags=str(drawing_tag))
+            self.drawings.append((drawing_tag,d))
 
     def stop_drawing(self, e): #TODO save into temp folder and add return values
-        global isDrawing
+        global isDrawing, drawing_tag
         isDrawing=False
+        self.drawingTags.append(drawing_tag)
         #SAVING
         ps = self.canvas.postscript(colormode='color')
         self.image = Image.open(io.BytesIO(ps.encode('utf-8')))
@@ -66,6 +75,17 @@ class DrawingCanvas(tk.Canvas):
         return 0
 
    
+    def undo(self):
+        (_tag, item) = self.drawings.pop()
+        l = len(self.drawings)
+        self.canvas.delete(item)
 
+        for i in range(l):
+            (tag,item) = self.drawings.pop()
+            if tag == _tag:
+                self.canvas.delete(item)
+            else:
+                self.drawings.append((tag,item))
+                break
     def clear(self):
         return

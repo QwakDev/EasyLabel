@@ -61,6 +61,8 @@ def btn_load_path_click():
                 _n = _n + 1
 def scale_set_pen_size(val):
     canvas.pen_size = int(val)
+def checkbox_set_highlight(val):
+    canvas.highlight = val
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')
