@@ -1,22 +1,26 @@
 import tkinter as tk
 from source.pen import DrawingCanvas
 import source.files as FILE
+from source.settings import sets
 
 
 window = tk.Tk()
+SETTINGS = sets()
 ##VARIABLES
 _saved_num_files = 0
+isCkecked_highlight = tk.BooleanVar()
+isCkecked_multi = tk.BooleanVar()
 saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUES
-#TODO drawing rect
-#TODO highlight option
-#TODO TEMP file canvas
-#TODO Undo button
+#TODO color label
 #TODO Saving only highlighted area
 #TODO CREATE LIB for image procesing
-def onSelect_lisbox_items(e):
+#TODO label objects drawings
+#TODO MULTI LABEL SAVE
+
+def onSelect_listbox_items(e):
     selection = e.widget.curselection()
     if e.widget.get(selection[0]) != '':
         _item_name = e.widget.get(selection[0])
@@ -24,6 +28,10 @@ def onSelect_lisbox_items(e):
         canvas.set_drawing(img)
         window.mainloop()
     return 0
+def onSelect_listbox_label(e):
+    selection = e.widget.curselection()
+    SETTINGS.highlighter_color = listbox_label.itemcget(selection[0], 'background') # GET COLOR
+   # .itemconfig
 def btn_next_click():
     global _saved_num_files, saved_num_files
     _saved_num_files = _saved_num_files + 1
@@ -32,10 +40,14 @@ def btn_next_click():
     window.mainloop()
 def btn_add_label_click(): 
     listbox_label.insert(4,text_label.get(1.0, 'end-1c'))
+    _index = listbox_label.index('end') - 1
+    _color = SETTINGS.get_next_color()
+    listbox_label.itemconfig(_index, background = _color)
     text_label.delete(1.0, 'end-1c')
     text_label.insert('end-1c', 'TYPE NEW LABEL' )
 def btn_remove_label_click():
     i = listbox_label.curselection()
+    canvas.clear_label(listbox_label.itemcget(i, 'background'))
     listbox_label.delete(i)
 def btn_save_path_click():
     o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
@@ -62,9 +74,14 @@ def btn_load_path_click():
 def btn_undo_click():
     canvas.undo()
 def scale_set_pen_size(val):
-    canvas.pen_size = int(val)
-def checkbox_set_highlight(val):
-    canvas.highlight = val
+    SETTINGS.pen_size = int(val)
+def btn_highlight_click():
+    SETTINGS.isHighlighting = isCkecked_highlight.get()
+    return
+def btn_multi_click():
+    if isCkecked_multi.get() == True:
+        print('M')
+    return
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')
@@ -77,7 +94,7 @@ frame_right.pack(side='right')
 frame_main.pack(side='top')
 frame_options.pack(side='bottom')
 #MAIN
-canvas = DrawingCanvas(window=frame_main,height=600, width=600)
+canvas = DrawingCanvas(window=frame_main,height=600, width=600, sets= SETTINGS)
 #OPTIONS (BOTTOM PANEL)
 #RIGHT_PANEL
 frame_path = tk.Frame(frame_right)                      
@@ -88,7 +105,7 @@ btn_load_path = tk.Button(frame_path,text='LOAD_DIR',command=btn_load_path_click
 btn_load_path.pack(side='left')
 
 listbox_path = tk.Listbox(frame_right, width=70, exportselection=False)  
-listbox_path.bind('<<ListboxSelect>>', onSelect_lisbox_items)      
+listbox_path.bind('<<ListboxSelect>>', onSelect_listbox_items)      
 frame_path.pack()
 listbox_path.pack()
 
@@ -101,7 +118,8 @@ text_label.pack(side='right')
 btn_add_label = tk.Button(frame_label,text='ADD_LABEL',command=btn_add_label_click)
 btn_add_label.pack(side='left')
 
-listbox_label = tk.Listbox(frame_right, width=70 ,height=4, exportselection=False )
+listbox_label = tk.Listbox(frame_right, width=70 ,height=4, exportselection=False)
+listbox_label.bind('<<ListboxSelect>>', onSelect_listbox_label)      
 
 frame_label.pack()
 listbox_label.pack()
@@ -116,16 +134,16 @@ btn_save_path.pack(side='left')
 frame_s_path.pack()
 
 frame_pen = tk.Frame(frame_right)
-checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
-checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT')
-checkbox_smooth = tk.Checkbutton(frame_pen, text='SMOOTH')
+#checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
+checkbox_multi = tk.Checkbutton(frame_pen, text='MULTI_LABEL',variable=isCkecked_multi, command= btn_multi_click)
+checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT',variable=isCkecked_highlight, command= btn_highlight_click)
 scale_pen_size = tk.Scale(frame_pen, orient='horizontal', from_=3, to=40,command=scale_set_pen_size)
 btn_undo = tk.Button(frame_pen, text='UNDO', command=btn_undo_click)
 
 frame_pen.pack()
 checkbox_highlight.pack(side='left')
-checkbox_auto_fill.pack(side='left')
-checkbox_smooth.pack(side='left')
+#checkbox_auto_fill.pack(side='left')
+checkbox_multi.pack(side='left')
 btn_undo.pack(side='left')
 scale_pen_size.pack(side='left')
 
