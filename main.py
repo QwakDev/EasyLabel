@@ -13,8 +13,7 @@ isCkecked_multi = tk.BooleanVar()
 saved_num_files = tk.StringVar()
 saved_num_files.set(str(_saved_num_files))
 ##ACTIONS
-#BUTTONS, LISTS AND VALUES
-#TODO color label
+#BUTTONS, LISTS AND VALUESs
 #TODO Saving only highlighted area
 #TODO CREATE LIB for image procesing
 #TODO label objects drawings
@@ -36,6 +35,8 @@ def btn_next_click():
     global _saved_num_files, saved_num_files
     _saved_num_files = _saved_num_files + 1
     saved_num_files.set(str(_saved_num_files))
+    #if SETTINGS.isHighlighting:#multiple labels save
+        
     FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()))
     window.mainloop()
 def btn_add_label_click(): 
@@ -82,6 +83,12 @@ def btn_multi_click():
     if isCkecked_multi.get() == True:
         print('M')
     return
+def btn_debug_click():
+    print('DEBUG:')
+    i = listbox_label.curselection()[0]
+    print(i)
+    print(listbox_label.itemcget(i, 'background'))
+    canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')
@@ -89,6 +96,9 @@ window.geometry('1200x650')
 frame_options = tk.Frame(window)
 frame_right = tk.Frame(window)
 frame_main = tk.Frame(window)
+#DEBUG
+btn_debug = tk.Button(frame_options,text='DEBUG',command=btn_debug_click)
+btn_debug.pack(side='left')
 
 frame_right.pack(side='right')
 frame_main.pack(side='top')

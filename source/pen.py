@@ -58,7 +58,6 @@ class DrawingCanvas(tk.Canvas):
             y1 = y + r
             d=self.canvas.create_oval(x0, y0, x1, y1, fill=pen_color, outline=pen_color, tags=str(drawing_tag))
             self.drawings.append((drawing_tag, d, pen_color))
-
     def stop_drawing(self, e): #TODO save into temp folder and add return values
         global isDrawing, drawing_tag
         isDrawing=False
@@ -72,7 +71,18 @@ class DrawingCanvas(tk.Canvas):
         self.image = None
         self.canvas.delete('all')
         self.canvas.create_image(0,0,image=data, anchor='nw')
-
+    def get_labeled_drawing(self, label_color):
+        current = self.image
+        col_list = []
+        #label_set = set(self.drawings)
+        
+        for _, __, col in self.drawings:
+            col_list.append(col)
+        col_set = set(col_list)
+        for x in col_set:
+            if x != 'black' and x != label_color:
+                self.clear_label(x)
+        return
     def load_image(self, imgFilePath = None, data = None):
         self.canvas.create_image(image=data)
 
@@ -83,7 +93,6 @@ class DrawingCanvas(tk.Canvas):
         (_tag, item, _) = self.drawings.pop()
         l = len(self.drawings)
         self.canvas.delete(item)
-
         for i in range(l):
             (tag,item, _) = self.drawings.pop()
             if tag == _tag:
