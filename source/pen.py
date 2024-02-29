@@ -76,6 +76,8 @@ class DrawingCanvas(tk.Canvas):
 
    
     def undo(self):
+        if self.drawings == []:
+            return
         (_tag, item) = self.drawings.pop()
         l = len(self.drawings)
         self.canvas.delete(item)

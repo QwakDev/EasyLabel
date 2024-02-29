@@ -59,6 +59,8 @@ def btn_load_path_click():
             if i[-4:].lower() == '.jpg':
                 listbox_path.insert(_n, i)
                 _n = _n + 1
+def btn_undo_click():
+    canvas.undo()
 def scale_set_pen_size(val):
     canvas.pen_size = int(val)
 def checkbox_set_highlight(val):
@@ -118,11 +120,13 @@ checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
 checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT')
 checkbox_smooth = tk.Checkbutton(frame_pen, text='SMOOTH')
 scale_pen_size = tk.Scale(frame_pen, orient='horizontal', from_=3, to=40,command=scale_set_pen_size)
+btn_undo = tk.Button(frame_pen, text='UNDO', command=btn_undo_click)
 
 frame_pen.pack()
 checkbox_highlight.pack(side='left')
 checkbox_auto_fill.pack(side='left')
 checkbox_smooth.pack(side='left')
+btn_undo.pack(side='left')
 scale_pen_size.pack(side='left')
 
 
