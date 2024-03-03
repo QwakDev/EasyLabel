@@ -61,6 +61,8 @@ def btn_save_path_click():
     _n = 1
     for l in _labels[1]:
         listbox_label.insert(_n, l)
+        _color = SETTINGS.get_next_color()
+        listbox_label.itemconfig(_n - 1, background = _color)
         _n = _n + 1
 def btn_load_path_click():
     _items = FILE.GetListOfFiles(text_path.get(1.0, 'end-1c'))
@@ -88,7 +90,10 @@ def btn_debug_click():
     i = listbox_label.curselection()[0]
     print(i)
     print(listbox_label.itemcget(i, 'background'))
-    canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
+    #c = copy.deepcopy(canvas)
+
+    drawing = canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
+    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), drawing,listbox_label.get(listbox_label.curselection()))
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')

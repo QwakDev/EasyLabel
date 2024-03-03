@@ -2,6 +2,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import os
 import io
+import copy
+
 
 from source.settings import sets 
 
@@ -73,6 +75,8 @@ class DrawingCanvas(tk.Canvas):
         self.canvas.create_image(0,0,image=data, anchor='nw')
     def get_labeled_drawing(self, label_color):
         current = self.image
+        current_canvas = self.canvas
+        copy_canvas = copy.copy(self.canvas)
         col_list = []
         #label_set = set(self.drawings)
         
@@ -82,7 +86,9 @@ class DrawingCanvas(tk.Canvas):
         for x in col_set:
             if x != 'black' and x != label_color:
                 self.clear_label(x)
-        return
+        copyOut = copy.copy(self.image)
+        self.canvas = copy_canvas
+        return copyOut
     def load_image(self, imgFilePath = None, data = None):
         self.canvas.create_image(image=data)
 
@@ -105,14 +111,12 @@ class DrawingCanvas(tk.Canvas):
         if self.drawings == []:
             return
         n = (len(self.drawings))
-        callouts = 0
         for x in range(n):
             i = self.drawings[x]
             (tag,item, col) = i
             if col == color:
                 self.canvas.delete(item)
                 newDrawings.remove(i)
-            callouts = callouts + 1
         self.drawings = newDrawings
 
 

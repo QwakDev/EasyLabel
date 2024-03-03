@@ -6,7 +6,7 @@ import os
 import io
 #TODO LABEL.txt, config.txt, 1.jpg, 2.jpg... 
 def GetNumberOfPictures(path):
-    return len(GetListOfFiles(path)) - 1
+    return len(GetListOfFiles(path)) - 2
 def CreateConfigFile():
     return 0
 def AppendLabelFile(path, label):
@@ -38,6 +38,7 @@ def GetListOfFiles(path):
 def GetPicture(path):
     return ImageTk.PhotoImage(file=path)
 def SetSavingDir(path):
+    SetTempDir(path)
     if os.path.isdir(path):
         if os.path.exists(path + 'Label.txt'):
             return GetNumberOfPictures(path)
@@ -52,6 +53,15 @@ def SaveFile(path, data, label):
     name = GetNumberOfPictures(path)
     data.save(path + str(name) + '.jpg')
     AppendLabelFile(path, label)
-
     return 0
 
+def SetTempDir(path):
+    _path = path + 'TEMP_DIR/'
+    if os.path.isdir(_path):
+        if os.path.exists(_path +'Labels.txt'):
+            return 0
+        os.open(_path + 'Labels.txt', os.O_CREAT)
+    else:
+        os.mkdir(_path)
+        os.open(_path + 'Labels.txt', os.O_CREAT)
+    return 0
