@@ -55,6 +55,7 @@ def btn_next_click():
 
         #TODO SEPERATE PICTURE and LABELS, and save one by one
     else: # SAVE JUST LABEL AND PICTURE
+        window.after(20,canvas.clear_labels()) #GET CLEAN PICTURE
         FILE.SaveFile(get_s_path(), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()), toTemp=False)
 
     saved_num_files.set(str(FILE.GetNumberOfPictures(get_s_path())))
@@ -100,6 +101,8 @@ def scale_set_pen_size(val):
     SETTINGS.pen_size = int(val)
 def btn_highlight_click():
     SETTINGS.isHighlighting = isCkecked_highlight.get()
+    return
+def btn_multi_click():
     return
 def btn_debug_click():
     print('DEBUG:')
