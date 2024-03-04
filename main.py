@@ -8,17 +8,15 @@ import time
 window = tk.Tk()
 SETTINGS = sets()
 ##VARIABLES
-_saved_num_files = 0
 isCkecked_highlight = tk.BooleanVar()
 isCkecked_multi = tk.BooleanVar()
 saved_num_files = tk.StringVar()
-saved_num_files.set(str(_saved_num_files))
+saved_num_files.set(str(0))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUESs
 #TODO Saving only highlighted area
 #TODO CREATE LIB for image procesing
-#TODO label objects drawings
-#TODO MULTI LABEL SAVE
+def get_s_path(): return text_s_path.get(1.0, 'end-1c')
 
 def onSelect_listbox_items(e):
     selection = e.widget.curselection()
@@ -33,12 +31,33 @@ def onSelect_listbox_label(e):
     SETTINGS.highlighter_color = listbox_label.itemcget(selection[0], 'background') # GET COLOR
    # .itemconfig
 def btn_next_click():
-    global _saved_num_files, saved_num_files
-    _saved_num_files = _saved_num_files + 1
-    saved_num_files.set(str(_saved_num_files))
-    #if SETTINGS.isHighlighting:#multiple labels save
-        
-    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()))
+    global saved_num_files, isCkecked_multi
+    if isCkecked_multi.get(): #SAVE MULTIPLE PICTURES 
+        path_temp = get_s_path() + 'TEMP_DIR/'
+        col_set = []
+        for col in COLORS:
+            (x, _,_,_) = col
+            col_set.append(x)
+        Temp_Labels = []
+        for n in range(listbox_label.index('end')): 
+            b_col = listbox_label.itemcget(n, 'background')
+            i = col_set.index(b_col)
+            (_,b,g,r) = COLORS[i]
+            toSave = "{},{},{},{}\n".format(listbox_label.get(n), b,g,r)
+            Temp_Labels.append(toSave)
+
+        FILE.SaveTempLabels(get_s_path(), Temp_Labels) # SAVE LABELS WITH BGR color
+
+        FILE.SaveFile(path_temp, canvas.get_drawing(),label=None, toTemp=True) #SAVE LABELED TEMP_PICTURE
+        window.after(20,canvas.clear_labels()) #GET CLEAN PICTURE
+
+        FILE.SaveFile(path_temp + '_', canvas.get_drawing(), label=None, toTemp=True) #SAVE CLEAN TEMP_PICTURE
+
+        #TODO SEPERATE PICTURE and LABELS, and save one by one
+    else: # SAVE JUST LABEL AND PICTURE
+        FILE.SaveFile(get_s_path(), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()), toTemp=False)
+
+    saved_num_files.set(str(FILE.GetNumberOfPictures(get_s_path())))
     window.mainloop()
 def btn_add_label_click(): 
     listbox_label.insert(listbox_label.index('end'),text_label.get(1.0, 'end-1c'))
@@ -52,12 +71,12 @@ def btn_remove_label_click():
     canvas.clear_label(listbox_label.itemcget(i, 'background'))
     listbox_label.delete(i)
 def btn_save_path_click():
-    o = FILE.SetSavingDir(text_s_path.get(1.0, 'end-1c'))
+    o = FILE.SetSavingDir(get_s_path())
     global _saved_num_files, saved_num_files
     _saved_num_files = o
     saved_num_files.set(str(_saved_num_files))
 
-    _labels = FILE.GetLabels(text_s_path.get(1.0, 'end-1c'))
+    _labels = FILE.GetLabels(get_s_path())
     listbox_label.delete(0, tk.END)
     _n = 1
     for l in _labels[1]:
@@ -82,42 +101,9 @@ def scale_set_pen_size(val):
 def btn_highlight_click():
     SETTINGS.isHighlighting = isCkecked_highlight.get()
     return
-def btn_multi_click():
-    if isCkecked_multi.get() == True:
-        print('M')
-    return
 def btn_debug_click():
     print('DEBUG:')
-    path_temp = text_s_path.get(1.0, 'end-1c') + 'TEMP_DIR/'
-
-    col_set = []
-    for col in COLORS:
-        (x, _,_,_) = col
-        col_set.append(x)
-    Temp_Labels = []
-    for n in range(listbox_label.index('end')):
-        b_col = listbox_label.itemcget(n, 'background')
-        i = col_set.index(b_col)
-        (_,b,g,r) = COLORS[i]
-        toSave = "{},{},{},{}\n".format(listbox_label.get(n), b,g,r)
-        Temp_Labels.append(toSave)
-        #print("{},{},{},{}".format(b_col, b,g,r))
-        #print(listbox_label.get(n))
-    FILE.SaveTempLabels(text_s_path.get(1.0, 'end-1c'), Temp_Labels)
-    #b_col = listbox_label.itemcget(i, 'background')
-    #print(b_col)
-    #c = copy.deepcopy(canvas)
-
-    #drawing = canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
-    FILE.SaveFile(path_temp, canvas.get_drawing(),label=None, toTemp=True)
-    window.after(20,canvas.clear_labels())
-    #window.mainloop()
-    #print('ok')
-
-    #window.after(2000,canvas.canvas.update_idletasks())
-    #print('ok')
-
-    FILE.SaveFile(path_temp + '_', canvas.get_drawing(), label=None, toTemp=True)
+    
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')
