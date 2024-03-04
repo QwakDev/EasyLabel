@@ -65,6 +65,8 @@ class DrawingCanvas(tk.Canvas):
         isDrawing=False
         self.drawingTags.append(drawing_tag)
         #SAVING
+        self.update_drawing()
+    def update_drawing(self):
         ps = self.canvas.postscript(colormode='color')
         self.image = Image.open(io.BytesIO(ps.encode('utf-8')))
     def get_drawing(self):
@@ -106,6 +108,7 @@ class DrawingCanvas(tk.Canvas):
             else:
                 self.drawings.append((tag,item, _))
                 break
+        self.update_drawing()
     def clear_label(self, color):
         newDrawings = self.drawings.copy()
         if self.drawings == []:
@@ -118,7 +121,17 @@ class DrawingCanvas(tk.Canvas):
                 self.canvas.delete(item)
                 newDrawings.remove(i)
         self.drawings = newDrawings
-
+        self.update_drawing()
+    def clear_labels(self):
+        col_list = []
+        #label_set = set(self.drawings)
+        
+        for _, __, col in self.drawings:
+            if col != 'black':
+                col_list.append(col)
+        col_set = set(col_list)
+        for x in col_set:
+            self.clear_label(x)
 
     def clear(self):
         return

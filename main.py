@@ -1,7 +1,8 @@
 import tkinter as tk
 from source.pen import DrawingCanvas
 import source.files as FILE
-from source.settings import sets
+from source.settings import sets, COLORS
+import time
 
 
 window = tk.Tk()
@@ -40,7 +41,7 @@ def btn_next_click():
     FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()))
     window.mainloop()
 def btn_add_label_click(): 
-    listbox_label.insert(4,text_label.get(1.0, 'end-1c'))
+    listbox_label.insert(listbox_label.index('end'),text_label.get(1.0, 'end-1c'))
     _index = listbox_label.index('end') - 1
     _color = SETTINGS.get_next_color()
     listbox_label.itemconfig(_index, background = _color)
@@ -87,13 +88,36 @@ def btn_multi_click():
     return
 def btn_debug_click():
     print('DEBUG:')
-    i = listbox_label.curselection()[0]
-    print(i)
-    print(listbox_label.itemcget(i, 'background'))
+    path_temp = text_s_path.get(1.0, 'end-1c') + 'TEMP_DIR/'
+
+    col_set = []
+    for col in COLORS:
+        (x, _,_,_) = col
+        col_set.append(x)
+    Temp_Labels = []
+    for n in range(listbox_label.index('end')):
+        b_col = listbox_label.itemcget(n, 'background')
+        i = col_set.index(b_col)
+        (_,b,g,r) = COLORS[i]
+        toSave = "{},{},{},{}\n".format(listbox_label.get(n), b,g,r)
+        Temp_Labels.append(toSave)
+        #print("{},{},{},{}".format(b_col, b,g,r))
+        #print(listbox_label.get(n))
+    FILE.SaveTempLabels(text_s_path.get(1.0, 'end-1c'), Temp_Labels)
+    #b_col = listbox_label.itemcget(i, 'background')
+    #print(b_col)
     #c = copy.deepcopy(canvas)
 
-    drawing = canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
-    FILE.SaveFile(text_s_path.get(1.0, 'end-1c'), drawing,listbox_label.get(listbox_label.curselection()))
+    #drawing = canvas.get_labeled_drawing(listbox_label.itemcget(i, 'background'))
+    FILE.SaveFile(path_temp, canvas.get_drawing(),label=None, toTemp=True)
+    window.after(20,canvas.clear_labels())
+    #window.mainloop()
+    #print('ok')
+
+    #window.after(2000,canvas.canvas.update_idletasks())
+    #print('ok')
+
+    FILE.SaveFile(path_temp + '_', canvas.get_drawing(), label=None, toTemp=True)
 ##VIEWS
 window.title("EasyLoop App")
 window.geometry('1200x650')

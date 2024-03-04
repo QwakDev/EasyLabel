@@ -49,10 +49,14 @@ def SetSavingDir(path):
         os.open(path + 'Label.txt', os.O_CREAT)
         return 0
     
-def SaveFile(path, data, label):
-    name = GetNumberOfPictures(path)
+def SaveFile(path, data, label, toTemp=False):
+    name = ''
+    if toTemp:
+        name = 'temp'
+    else:
+        name = GetNumberOfPictures(path)
+        AppendLabelFile(path, label)
     data.save(path + str(name) + '.jpg')
-    AppendLabelFile(path, label)
     return 0
 
 def SetTempDir(path):
@@ -65,3 +69,12 @@ def SetTempDir(path):
         os.mkdir(_path)
         os.open(_path + 'Labels.txt', os.O_CREAT)
     return 0
+def SaveTempLabels(path, lines):
+    _path = path + 'TEMP_DIR/' + 'Labels.txt'
+    f = os.open(_path, os.O_APPEND)
+    if lines != []:
+        with open(_path, 'w') as f:
+            f.write('')
+        for x in lines:
+            with open(_path, 'a') as f:
+                f.write(x)
