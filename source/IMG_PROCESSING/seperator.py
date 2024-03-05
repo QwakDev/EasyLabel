@@ -82,4 +82,4 @@ def SEPARATE(temp_dir_path, dif = 10):
                 cv.imwrite(p_save + NAME_labels[i] + '_' + str(file_number) + '.jpg', toSave)
                 file_number = file_number + 1
             
-SEPARATE('D:/Projects/EasyLabel/data_test/TEMP_DIR/', dif=0)
+#SEPARATE(<TEMP_DIR_PATH>, dif=0)
