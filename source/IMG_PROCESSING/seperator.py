@@ -1,4 +1,7 @@
-#GET REAL IMAGE IMAGE
-#GET LABELED IMAGE
-#GET LABELS
-#FOR COL IN LABELS -> MASK IMAGE , CROP AND SAVE
+import cv2 as cv
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+
