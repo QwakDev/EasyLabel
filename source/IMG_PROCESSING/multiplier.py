@@ -780,12 +780,136 @@ def MAIN_MAIN(path_temp, solid_color = None, solid_color_random = False,
      color_dif_HSV = (0,0,0), color_dif_n_steps=0, blur = 0, blur_random = False,
      color_mix = None, color_mix_random = False, color_mix_n_steps=0,
      shadow = False, shadow_doted = False, random_shadow = False,
-     rotate_X = 0, rotate_Y = 0, rotate_mirror_X = False, rotate_mirror_Y = False, Flip_X = False, Flip_Y= False,
-     kick_TOP = 0, kick_BOTTOM = 0, kick_LEFT = 0 , kick_RIGHT=0,
-     kick_mirror_TOP = False, kick_mirror_BOTTOM = False, kick_mirror_RIGHT = False, kick_mirror_LEFT = False,
+     noise = False, noise_random = False, reflection = (0,0),
+     rotate = 0, rotate_mirror = False, Flip_X = False, Flip_Y= False,
      deform_X = 0, deform_Y = 0, deform_chunks_X_min = 0, deform_chunks_Y_min = 0, deform_chunks_X_max = 0, deform_chunks_Y_max = 0):
 
      return
+def GET_shadow(img, mask, opacity_top, opacity_bottom):
+    (h,w,_) = img.shape
+    out_img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
+    #GET GRADIENT
+    g_bot = (255*opacity_top)/100
+    g_top = (255*opacity_bottom)/100
+    g_y = np.linspace(g_bot,g_top,h,dtype='uint8')
+    g_x = np.linspace(1,1,w,dtype='uint8')
+    grad = np.outer(g_y,g_x)
+    #ADD GRADIENT
+    out_img[:,:,3] = grad
+    #REDUCE BGRA to BGR
+    out = np.zeros(img.shape, dtype='uint8')
+
+    gray_grad = cv.cvtColor(grad,cv.COLOR_GRAY2BGR)
+    for hh in range(0,h - 1):
+        for ww in range(0, w-1):
+            a = out_img[hh][ww][3]/255
+            B = out_img[hh][ww][0]/255
+            G = out_img[hh][ww][1]/255
+            R = out_img[hh][ww][2]/255
+            bgB = gray_grad[hh][ww][0]/255
+            bgG = gray_grad[hh][ww][1]/255
+            bgR = gray_grad[hh][ww][2]/255
+            out[hh][ww][0] = (((1-a) * bgB) + (a*B)) * 255#B 
+            out[hh][ww][1] = (((1-a) * bgG) + (a*G)) * 255 #G
+            out[hh][ww][2] = (((1-a) * bgR) + (a*R)) * 255 #R
+    #GETTING MASK BITWISE
+    thresh = 254
+    grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+    (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+    im_bw_inv = cv.bitwise_not(im_bw)
+    #GETTING BACKGROUND 
+    bg = cv.bitwise_and(img, img, mask = im_bw_inv)
+    #CREATING SOLID COLOR PICTURE
+    #GETTING BACKGROUND
+    fg = cv.bitwise_and(out, out, mask = im_bw)
+    #BLENDING PICTURES
+    out = cv.add(bg,fg)
+    
+    return out
+def GET_reflection(img, mask, opacity_top, opacity_bottom):
+    (h,w,_) = img.shape
+    out_img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
+    #GET GRADIENT
+    g_bot = (255*opacity_top)/100
+    g_top = (255*opacity_bottom)/100
+    g_y = np.linspace(g_bot,g_top,h,dtype='uint8')
+    g_x = np.linspace(1,1,w,dtype='uint8')
+    grad = np.outer(g_y,g_x)
+    #ADD GRADIENT
+    out_img[:,:,3] = grad
+    #REDUCE BGRA to BGR
+    out = np.zeros(img.shape, dtype='uint8')
+
+    gray_grad = cv.cvtColor(grad,cv.COLOR_GRAY2BGR)
+    for hh in range(0,h - 1):
+        for ww in range(0, w-1):
+            a = out_img[hh][ww][3]/255
+            B = out_img[hh][ww][0]/255
+            G = out_img[hh][ww][1]/255
+            R = out_img[hh][ww][2]/255
+            bgB = gray_grad[hh][ww][0]/255
+            bgG = gray_grad[hh][ww][1]/255
+            bgR = gray_grad[hh][ww][2]/255
+            out[hh][ww][0] = (((1-a) * B) + (a*bgB)) * 255#B 
+            out[hh][ww][1] = (((1-a) * G) + (a*bgG)) * 255 #G
+            out[hh][ww][2] = (((1-a) * R) + (a*bgR)) * 255 #R
+    #GETTING MASK BITWISE
+    thresh = 254
+    grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+    (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+    im_bw_inv = cv.bitwise_not(im_bw)
+    #GETTING BACKGROUND 
+    bg = cv.bitwise_and(img, img, mask = im_bw_inv)
+    #CREATING SOLID COLOR PICTURE
+    #GETTING BACKGROUND
+    fg = cv.bitwise_and(out, out, mask = im_bw)
+    #BLENDING PICTURES
+    out = cv.add(bg,fg)
+    
+    return out
+def GET_rotate(img, mask, angle, mirror):
+    out = []
+    (h, w, _ ) =img.shape
+    #CENTER POINTS
+    cX, cY = w/2, h/2
+    if mirror == True:
+        for a in range(360 - angle, 359):
+            #ROTATION MATRIX
+            rotationM = cv.getRotationMatrix2D((cX, cY), a, 1.0)
+            #sin & cos ABSOLUTE VALUES
+            cosRotationM = np.abs(rotationM[0][0])
+            sinRotationM = np.abs(rotationM[0][1])
+            #NEW DIMENSIONS
+            nW = int((h*sinRotationM) + (w*cosRotationM))
+            nH = int((h*cosRotationM) + (w*sinRotationM))
+            #UPDATE ROTATION MATRIX
+            rotationM[0][2] += (nW/2) - cX
+            rotationM[1][2] += (nH/2) - cY
+            #rotate image
+            rot_img = cv.warpAffine(img, rotationM, (nW,nH))
+            out.append(rot_img)
+    for a in range(1, angle):
+        #ROTATION MATRIX
+        rotationM = cv.getRotationMatrix2D((cX, cY), a, 1.0)
+        #sin & cos ABSOLUTE VALUES
+        cosRotationM = np.abs(rotationM[0][0])
+        sinRotationM = np.abs(rotationM[0][1])
+        #NEW DIMENSIONS
+        nW = int((h*sinRotationM) + (w*cosRotationM))
+        nH = int((h*cosRotationM) + (w*sinRotationM))
+        #UPDATE ROTATION MATRIX
+        rotationM[0][2] += (nW/2) - cX
+        rotationM[1][2] += (nH/2) - cY
+        #rotate image
+        rot_img = cv.warpAffine(img, rotationM, (nW,nH))
+        out.append(rot_img)
+
+
+    return out
+def GET_flip_X(img, mask):
+    return cv.flip(img,0), cv.flip(mask,0)
+def GET_flip_Y(img, mask):
+    return cv.flip(img,1), cv.flip(mask,1)
 def GET_change_color_solid(img, mask, colors):#BGR
     out = []
     #GETTING MASK BITWISE
