@@ -20,7 +20,6 @@ SAVING SINGLE ELEMENT
 APPENDING FOLDER
 
 #GIThub crashes, for what ever reason can not upload the GIF :/
-![Uploading a.gif…]()
 
 
 
