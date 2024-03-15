@@ -78,3 +78,9 @@ def SaveTempLabels(path, lines):
         for x in lines:
             with open(_path, 'a') as f:
                 f.write(x)
+def SaveImages(path, IMAGES, label):
+    for i in IMAGES:
+        name = GetNumberOfPictures(path)
+        s_path = path + str(name) + '.jpg'
+        cv.imwrite(s_path, i)
+        AppendLabelFile(path,label)

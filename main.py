@@ -1,10 +1,12 @@
+import cv2 as cv
 import tkinter as tk
 from source.pen import DrawingCanvas
 import source.files as FILE
 from source.settings import sets, COLORS
 import time
-
-
+import random
+import source.IMG_PROCESSING.seperator as SEPARATOR
+import source.IMG_PROCESSING.multiplier as MULTIPLIER
 window = tk.Tk()
 SETTINGS = sets()
 ##VARIABLES
@@ -15,7 +17,7 @@ saved_num_files.set(str(0))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUESs
 #TODO Saving only highlighted area
-#TODO CREATE LIB for image procesing
+
 def get_s_path(): return text_s_path.get(1.0, 'end-1c')
 
 def onSelect_listbox_items(e):
@@ -31,7 +33,7 @@ def onSelect_listbox_label(e):
     SETTINGS.highlighter_color = listbox_label.itemcget(selection[0], 'background') # GET COLOR
    # .itemconfig
 def btn_next_click():
-    global saved_num_files, isCkecked_multi
+    global  isCkecked_multi
     if isCkecked_multi.get(): #SAVE MULTIPLE PICTURES 
         path_temp = get_s_path() + 'TEMP_DIR/'
         col_set = []
@@ -53,7 +55,14 @@ def btn_next_click():
 
         FILE.SaveFile(path_temp + '_', canvas.get_drawing(), label=None, toTemp=True) #SAVE CLEAN TEMP_PICTURE
 
-        #TODO SEPERATE PICTURE and LABELS, and save one by one
+        items = SEPARATOR.SEPARATE(path_temp)
+        for (_lab, _p_img, _p_mask) in items:
+            colorsSample = random.sample(COLORS, 2)
+            _img = cv.imread(_p_img)
+            _mask = cv.imread(_p_mask)
+            IMGS = MULTIPLIER.GET_ALL(_img,_mask,solid_color=colorsSample, rotate=5,rotate_mirror=True)
+            FILE.SaveImages(get_s_path(),IMGS,_lab)
+
     else: # SAVE JUST LABEL AND PICTURE
         window.after(20,canvas.clear_labels()) #GET CLEAN PICTURE
         FILE.SaveFile(get_s_path(), canvas.get_drawing(),listbox_label.get(listbox_label.curselection()), toTemp=False)
@@ -81,6 +90,8 @@ def btn_save_path_click():
     listbox_label.delete(0, tk.END)
     _n = 1
     for l in _labels[1]:
+        if l == '':
+            continue
         listbox_label.insert(_n, l)
         _color = SETTINGS.get_next_color()
         listbox_label.itemconfig(_n - 1, background = _color)
@@ -190,4 +201,41 @@ btn_next.pack(side='left')
 checkbox_auto_s.pack(side='right')
 
 
+
+#DEBUGGGGGG
+def popupwin():
+   #Create a Toplevel window
+   top= tk.Toplevel(window)
+   top.geometry("750x250")
+
+   #Create an Entry Widget in the Toplevel window
+   entry= tk.Entry(top, width= 25)
+   entry.pack()
+
+   #Create a Button to print something in the Entry widget
+   tk.Button(top,text= "Insert").pack(pady= 5,side='top')
+   #Create a Button Widget in the Toplevel Window
+
+
+def donothing():
+    
+    popupwin()
+    return
+menubar = tk.Menu(window)
+filemenu = tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="MUL_shadow")
+filemenu.add_command(label="MUL_color", command=donothing)
+filemenu.add_command(label="Save", command=donothing)
+filemenu.add_command(label="Save as...", command=donothing)
+filemenu.add_command(label="Close", command=donothing)
+menubar.add_cascade(label="Settings", menu=filemenu)
+window.config(menu=menubar)
+
+
+
+
+
+
+
+#END OF DEBUUUG
 window.mainloop()
