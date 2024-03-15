@@ -8,7 +8,7 @@ MULTI LABEL SAVE AND DATA MULTIPLICATION
 VIEWING IMAGES MODIFYING LABLING AND SAVING
 
 
-
+#GIThub crashes, for what ever reason can not upload the GIF :/
 
 
 SAVING SINGLE ELEMENT
@@ -19,8 +19,11 @@ SAVING SINGLE ELEMENT
 
 APPENDING FOLDER
 
+#GIThub crashes, for what ever reason can not upload the GIF :/
+![Uploading a.gif…]()
 
 
 
+BASIC FUNCTIONALITY
 
 ![EASY_LABEL](https://github.com/QwakDev/EasyLabel/assets/130720687/e3d823c7-5b1b-432d-806b-1cccd8859b12)
