@@ -1278,5 +1278,4 @@ def GET_noise(img, mask, whites = False):
 
     out = cv.add(bg,fg.astype('uint8'))
     return out
-#DEBUG
-
+#DEBU
