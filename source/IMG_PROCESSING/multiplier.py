@@ -2,13 +2,7 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import random
 import numpy as np
-# rotate
-# change color
-#kick
-# add shadow
 
-#change color solid
-#change color mix
 COLOR_MAPS = [cv.COLORMAP_AUTUMN, cv.COLORMAP_BONE, cv.COLORMAP_JET,cv.COLORMAP_WINTER, cv.COLORMAP_RAINBOW,
 cv.COLORMAP_OCEAN, cv.COLORMAP_SUMMER, cv.COLORMAP_SPRING, cv.COLORMAP_COOL, cv.COLORMAP_HSV, cv.COLORMAP_PINK,
 cv.COLORMAP_HOT, cv.COLORMAP_PARULA, cv.COLORMAP_MAGMA, cv.COLORMAP_INFERNO, cv.COLORMAP_PLASMA,
@@ -775,16 +769,197 @@ COLORS = [
 ('SlateBlue3',205,89,105),
 ('LimeGreen',50,205,50),
 ('DarkCyan',139,139,0)]
+#DEFORM -> COLOR -> BLUR -> SHADOW -> NOISE -> ROTATION
+        #OUT_imgs []
+        #for im in imgs
+            #PROCESS
+            #APPEND OUT_imgs
+        #POP OUT_imgs into imgs
+        #...
+        #RETURN imgs
+def GET_ALL(img, mask, solid_color = None, solid_color_random = False,
+    color_dif_HSV = (0,0,0), color_dif_n_steps=0, blur = False, blur_random = False,
+    color_mix = None, color_mix_random = False, color_mix_n_steps=0,
+    shadow = False, shadow_random = False,
+    noise = False, noise_random = False, reflection = False,
+    rotate = 0, rotate_mirror = False, Flip_X = False, Flip_Y= False,
+    deform_X = 0, deform_Y = 0, deform_chunks_X_min = 0, deform_chunks_Y_min = 0, deform_chunks_X_max = 0, deform_chunks_Y_max = 0):
+    #TODO FILL :
+    #COLOR_dif_hsv
+    #COLOR MIX
+    #NOISE_RANDOM
+    #SHADOW_RANDOM
+    IMGS = []
+    IMGS.append(img)
+    #DEFORMATION
+    OUT_imgs = []
+    if deform_X > 0:
+        OUT_imgs.append(GET_deform(img,maxT=deform_X,chunks_min=deform_chunks_X_min,chunks_max=deform_chunks_X_max))
+    if deform_Y > 0:
+        OUT_imgs.append(GET_deform(img,maxT=deform_Y,axis=False,chunks_min=deform_chunks_Y_min,chunks_max=deform_chunks_Y_max))
+    IMGS.extend(OUT_imgs)
+    #COLOR SOLID
+    OUT_imgs=[]
+    if solid_color != None:
+        for i in IMGS:
+            OUT_imgs.extend(GET_change_color_solid(img,mask,solid_color))
+    IMGS.extend(OUT_imgs)
+    #COLOR SOLID RANDOM
+    if solid_color_random:
+        IMGS.append(GET_change_color_random(img,mask))
+    
+    #BLUR
+    OUT_imgs=[]
+    if blur:
+        for i in IMGS:
+            OUT_imgs.append(GET_blur(i, mask))
+    #BLUR RANDOM
+    if blur_random:
+        for i in IMGS:
+            OUT_imgs.append(GET_blur_random(i, mask))
+    IMGS.extend(OUT_imgs)
+    #REFLECTION
+    OUT_imgs = []
+    if reflection:
+        for i in IMGS:
+            OUT_imgs.append(GET_reflection(i,mask,90,10))
+    IMGS.extend(OUT_imgs)
+    #SHADOW
+    OUT_imgs = []
+    if shadow:
+        for i in IMGS:
+            OUT_imgs.append(GET_shadow(i,mask,90,10))
+    IMGS.extend(OUT_imgs)
+    #SHADOW RANDOM TODO
+    #NOISE TODO: COLORED IMAGES SEEM TO GET NO NOISE 
+    OUT_imgs = []
+    if noise:
+        for i in IMGS:
+            OUT_imgs.append(GET_noise(i,mask,True))
+            OUT_imgs.append(GET_noise(i,mask,False))
+    IMGS.extend(OUT_imgs)
+    #ROTATE
+    OUT_imgs = []
+    if rotate > 0:
+        for i in IMGS:
+            OUT_imgs.extend(GET_rotate(i, mask, rotate,rotate_mirror))
+    IMGS.extend(OUT_imgs)
+    #FLIP
+    OUT_imgs = []
+    if Flip_X:
+        for i in IMGS:
+            OUT_imgs.append(GET_flip_X(i,mask))
+    if Flip_Y:
+        for i in IMGS:
+            OUT_imgs.append(GET_flip_Y(i,mask))
+    if Flip_Y and Flip_X:
+        for i in IMGS:
+            OUT_imgs.append(GET_flip_Y(GET_flip_X(i,mask),mask))
+    IMGS.extend(OUT_imgs)
+    OUT_imgs=[]
+    return IMGS
+def GET_deform(img,minT=0, maxT=2,axis = True,chunks_min = 3,chunks_max = 7):
+    h,w,_ = img.shape
+    out = img.copy()
+    img_chunks = []
+    #getting CHUNKS
+    cMax = 0
+    if axis:
+        cMax = h
+    else: 
+        cMax = w
+    chunked = 0
+    while chunked<cMax:
+            c = random.randint(chunks_min,chunks_max)
+            chunk = None
+            #GETTING INDIVIDUAL CHUNK
+            if axis:
+                chunk = img[chunked:(chunked + c), :]
 
-def MAIN_MAIN(path_temp, solid_color = None, solid_color_random = False,
-     color_dif_HSV = (0,0,0), color_dif_n_steps=0, blur = 0, blur_random = False,
-     color_mix = None, color_mix_random = False, color_mix_n_steps=0,
-     shadow = False, shadow_doted = False, random_shadow = False,
-     noise = False, noise_random = False, reflection = (0,0),
-     rotate = 0, rotate_mirror = False, Flip_X = False, Flip_Y= False,
-     deform_X = 0, deform_Y = 0, deform_chunks_X_min = 0, deform_chunks_Y_min = 0, deform_chunks_X_max = 0, deform_chunks_Y_max = 0):
+            else:
+                chunk = img[:, chunked:(chunked + c)]
+            img_chunks.append(chunk)
+            chunked = chunked + c
+    img_chunks.pop()
+    #TRANSFORMING img by chunk
+    used= 0
+    for c in img_chunks:        
+        #GETTING transition value
+        plus_min = 1
+        pmR = random.randint(0,1)
+        if pmR == 1:
+            plus_min = (-1)
+        tv = plus_min * random.randint(minT,maxT)
+        #GETTING transition matrix
+        tx = 0
+        ty = 0
+        if axis:
+            tx = tv
+        else:
+            ty = tv
+        transitionM = np.array([
+        [1, 0, tx], #positive RIGHT, negative LEFT
+        [0, 1, ty] #positive DOWN, negative UP
+        ], dtype='float32')
+        #APPLYING transition to the chunk
+        h_c, w_c, _ = c.shape
+        t_chunk = cv.warpAffine(c,transitionM, (w_c, h_c))
+        #STICHING CHUNK on to the output
+        change = 0
+        if axis:
+            change = h_c
+            out[used:(used + change), :] = t_chunk
+        else:
+            change = w_c
+            out[:, used:(used + change)] = t_chunk
+        used = used + change
+    return  out
+def GET_random_poly_pts(minX,maxX,minY,maxY):
+    pts = []
+    
+    points = random.randint(3,9)
+    for n in range(0, points):
+        x = random.randint(minY,maxY)
+        y = random.randint(minX,maxX)
+        pts.append([x,y])
+        
+    pts = np.array(pts, dtype='uint8')
+    return pts
+def GET_random_mask(img, divisions, mask=''):
+                                    #divisions is the number of divisions of the image
+                                    #number of sections = 2^divisions
+    out = np.zeros(img.shape, dtype='uint8')
+    (h,w,_) = img.shape
+    h1 = h
+    w1 = w
+    #SECTION SIZES
+    for n in range(1,divisions):
+        h1 = (h1/2)
+        w1 = (w1/2)
+    x = 0
+    y = 0
+    #GETING SHAPE TO EVERY SECTION
+    while y != h:
+        x = 0
+        while x != w:
+            points = GET_random_poly_pts(int(y), int(y+h1),int(x),int(x+w1))
+            cv.fillPoly(out, pts=np.int32([points]), color = (255,255,255))
+            x = x + w1
+        y = y + h1
+    if mask != '':
+        #GETTING MASK BITWISE
+        thresh = 254
+        grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+        (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+        im_bw_inv = cv.bitwise_not(im_bw)
+        #GETTING BACKGROUND 
+        bg = cv.bitwise_and(mask, mask, mask = im_bw_inv)
+        fg = cv.bitwise_and(out, out, mask = im_bw)
 
-     return
+        out = cv.add(bg,fg)
+        return out
+    else:
+        return out
 def GET_shadow(img, mask, opacity_top, opacity_bottom):
     (h,w,_) = img.shape
     out_img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
@@ -907,9 +1082,9 @@ def GET_rotate(img, mask, angle, mirror):
 
     return out
 def GET_flip_X(img, mask):
-    return cv.flip(img,0), cv.flip(mask,0)
+    return cv.flip(img,0)
 def GET_flip_Y(img, mask):
-    return cv.flip(img,1), cv.flip(mask,1)
+    return cv.flip(img,1)
 def GET_change_color_solid(img, mask, colors):#BGR
     out = []
     #GETTING MASK BITWISE
@@ -931,16 +1106,17 @@ def GET_change_color_solid(img, mask, colors):#BGR
         out.append(toSave)
     return out
 def GET_change_color_random(img, mask):
+    out = img.copy()
     #GETTING MASK BITWISE
     thresh = 254
     grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
     (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
     im_bw_inv = cv.bitwise_not(im_bw)
     #GETTING BACKGROUND 
-    bg = cv.bitwise_and(img, img, mask = im_bw_inv)
+    bg = cv.bitwise_and(out, out, mask = im_bw_inv)
     #CREATING COLOR PICTURE
     col_pic = np.zeros(mask.shape, dtype='uint8')
-    (h,w,_) = img.shape
+    (h,w,_) = out.shape
     used_h = 0
     while h>used_h:
         y = random.randint(1,h-used_h)
@@ -950,7 +1126,7 @@ def GET_change_color_random(img, mask):
             #getting blur strength for the section
             color = random.randint(1,len(COLORS))
             #croping section
-            paint_section = img[used_h:used_h+y, used_w:used_w+x]
+            paint_section = out[used_h:used_h+y, used_w:used_w+x]
             #coloring section
             (_, b,g,r) = COLORS[color]
             paint_section[:] = [b,g,r]
@@ -980,20 +1156,21 @@ def GET_change_color_dif(img, mask, dif):#HSV VALUES
     out = cv.add(bg,fg)
     return out
 def GET_blur(img, mask):
-    blur_img = cv.blur(img, (3,3))
+    out = img.copy()
+    blur_img = cv.blur(out, (3,3))
     #GETTING MASK BITWISE
     thresh = 254
     grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
     (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
     im_bw_inv = cv.bitwise_not(im_bw)
     #GETTING BACKGROUND AND FOREGROUND
-    bg = cv.bitwise_and(img, img, mask = im_bw_inv)
+    bg = cv.bitwise_and(out, out, mask = im_bw_inv)
     fg = cv.bitwise_and(blur_img, blur_img, mask = im_bw)
     #BLENDING PICTURES
     out = cv.add(bg,fg)
     return out
 def GET_blur_random(img, mask):
-    blur_img = img
+    blur_img = img.copy()
     (h,w,_) = img.shape
 
     used_h = 0
@@ -1005,7 +1182,7 @@ def GET_blur_random(img, mask):
             #getting blur strength for the section
             blur_strength = random.randint(1,5)
             #croping section
-            blur_section = img[used_h:used_h+y, used_w:used_w+x]
+            blur_section = blur_img[used_h:used_h+y, used_w:used_w+x]
             #bluring
             blur_section = cv.blur(blur_section, (blur_strength,blur_strength))
             #pasting section into image
@@ -1075,3 +1252,31 @@ def GET_color_mix_random(img, mask):
     #BLENDING PICTURES
     out = cv.add(bg,fg)
     return out
+def GET_noise(img, mask, whites = False):
+    mean = 2
+    var = 5
+    sigma = var ** 0.5
+    gaussian = np.random.normal(mean, sigma, (img.shape[0],img.shape[1])) 
+    noise = np.zeros(img.shape, np.float32)
+    if whites:
+        noise[:, :, 0] = img[:, :, 0] + gaussian
+        noise[:, :, 1] = img[:, :, 1] + gaussian
+        noise[:, :, 2] = img[:, :, 2] + gaussian
+    else:
+        noise[:, :, 0] = img[:, :, 0] - gaussian
+        noise[:, :, 1] = img[:, :, 1] - gaussian
+        noise[:, :, 2] = img[:, :, 2] - gaussian
+    noise = noise.astype(np.uint8)
+    #GETTING MASK BITWISE
+    thresh = 254
+    grey =cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+    (_, im_bw) = cv.threshold(grey, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+    im_bw_inv = cv.bitwise_not(im_bw)
+    #GETTING BACKGROUND 
+    bg = cv.bitwise_and(img, img, mask = im_bw_inv)
+    fg = cv.bitwise_and(noise, noise, mask = im_bw)
+
+    out = cv.add(bg,fg.astype('uint8'))
+    return out
+
+
