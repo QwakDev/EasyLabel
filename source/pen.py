@@ -60,7 +60,7 @@ class DrawingCanvas(tk.Canvas):
             y1 = y + r
             d=self.canvas.create_oval(x0, y0, x1, y1, fill=pen_color, outline=pen_color, tags=str(drawing_tag))
             self.drawings.append((drawing_tag, d, pen_color))
-    def stop_drawing(self, e): #TODO save into temp folder and add return values
+    def stop_drawing(self, e): 
         global isDrawing, drawing_tag
         isDrawing=False
         self.drawingTags.append(drawing_tag)

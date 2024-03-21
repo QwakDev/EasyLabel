@@ -768,6 +768,7 @@ class sets:
         self.highlighter_color = 'black'
         self.LABELS_COLORS = []
 #MULTIPLY
+#TODO MORE OPTIONS (DEEPER)
         #COLOR
         self.MUL_col_solid = setting('color', name='solid_colors')
         self.MUL_col_solid_random = setting('bool', name='color_solid_random')

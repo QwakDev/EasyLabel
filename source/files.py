@@ -4,7 +4,6 @@ import cv2 as cv
 from PIL import Image , ImageTk
 import os
 import io
-#TODO LABEL.txt, config.txt, 1.jpg, 2.jpg... 
 def GetNumberOfPictures(path):
     return len(GetListOfFiles(path)) - 2
 def CreateConfigFile():
