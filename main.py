@@ -7,6 +7,7 @@ import time
 import random
 import source.IMG_PROCESSING.seperator as SEPARATOR
 import source.IMG_PROCESSING.multiplier as MULTIPLIER
+import source.view as VIEWS
 window = tk.Tk()
 SETTINGS = sets()
 ##VARIABLES
@@ -16,7 +17,6 @@ saved_num_files = tk.StringVar()
 saved_num_files.set(str(0))
 ##ACTIONS
 #BUTTONS, LISTS AND VALUESs
-#TODO Saving only highlighted area
 
 def get_s_path(): return text_s_path.get(1.0, 'end-1c')
 
@@ -57,10 +57,9 @@ def btn_next_click():
 
         items = SEPARATOR.SEPARATE(path_temp)
         for (_lab, _p_img, _p_mask) in items:
-            colorsSample = random.sample(COLORS, 2)
             _img = cv.imread(_p_img)
             _mask = cv.imread(_p_mask)
-            IMGS = MULTIPLIER.GET_ALL(_img,_mask,solid_color=colorsSample, rotate=5,rotate_mirror=True)
+            IMGS = MULTIPLIER.GET_ALL(_img,_mask,sets=SETTINGS)
             FILE.SaveImages(get_s_path(),IMGS,_lab)
 
     else: # SAVE JUST LABEL AND PICTURE
@@ -136,7 +135,8 @@ frame_options.pack(side='bottom')
 canvas = DrawingCanvas(window=frame_main,height=600, width=600, sets= SETTINGS)
 #OPTIONS (BOTTOM PANEL)
 #RIGHT_PANEL
-frame_path = tk.Frame(frame_right)                      
+frame_path = tk.Frame(frame_right) 
+#LIST OF FILES DIR                     
 text_path = tk.Text(frame_path, height=1, width=50)
 text_path.insert('end-1c', 'TYPE DIR PATH FROM WHERE TO LOAD FILES')
 text_path.pack(side='right')
@@ -147,7 +147,7 @@ listbox_path = tk.Listbox(frame_right, width=70, exportselection=False)
 listbox_path.bind('<<ListboxSelect>>', onSelect_listbox_items)      
 frame_path.pack()
 listbox_path.pack()
-
+#LIST OF LABELS
 frame_label = tk.Frame(frame_right)    
 btn_remove_label = tk.Button(frame_label,text='REMOVE_LABEL',command=btn_remove_label_click)
 btn_remove_label.pack(side='right')                 
@@ -162,7 +162,7 @@ listbox_label.bind('<<ListboxSelect>>', onSelect_listbox_label)
 
 frame_label.pack()
 listbox_label.pack()
-
+#SAVING PATH
 frame_s_path = tk.Frame(frame_right)
 text_s_path = tk.Text(frame_s_path, height=1, width=50)
 text_s_path.insert('end-1c', 'TYPE DIR WHERE TO SAVE FILE')
@@ -171,9 +171,8 @@ btn_save_path = tk.Button(frame_s_path,text='SAVE_TO',command=btn_save_path_clic
 text_s_path.pack(side='right')
 btn_save_path.pack(side='left')
 frame_s_path.pack()
-
+#OPTIONS
 frame_pen = tk.Frame(frame_right)
-#checkbox_auto_fill = tk.Checkbutton(frame_pen, text='AUTO_FILL')
 checkbox_multi = tk.Checkbutton(frame_pen, text='MULTI_LABEL',variable=isCkecked_multi, command= btn_multi_click)
 checkbox_highlight = tk.Checkbutton(frame_pen, text='HIGHLIGHT',variable=isCkecked_highlight, command= btn_highlight_click)
 scale_pen_size = tk.Scale(frame_pen, orient='horizontal', from_=3, to=40,command=scale_set_pen_size)
@@ -181,13 +180,12 @@ btn_undo = tk.Button(frame_pen, text='UNDO', command=btn_undo_click)
 
 frame_pen.pack()
 checkbox_highlight.pack(side='left')
-#checkbox_auto_fill.pack(side='left')
 checkbox_multi.pack(side='left')
 btn_undo.pack(side='left')
 scale_pen_size.pack(side='left')
 
 
-
+#SAVE BUTTON
 frame_s= tk.Frame(frame_right)
 btn_next = tk.Button(frame_s, text='SAVE_AND_NEXT',command=btn_next_click)
 checkbox_auto_s = tk.Checkbutton(frame_s, text='AUTO_SAVE')
@@ -202,38 +200,34 @@ checkbox_auto_s.pack(side='right')
 
 
 
-#DEBUGGGGGG
-def popupwin():
-   #Create a Toplevel window
-   top= tk.Toplevel(window)
-   top.geometry("750x250")
-
-   #Create an Entry Widget in the Toplevel window
-   entry= tk.Entry(top, width= 25)
-   entry.pack()
-
-   #Create a Button to print something in the Entry widget
-   tk.Button(top,text= "Insert").pack(pady= 5,side='top')
-   #Create a Button Widget in the Toplevel Window
-
-
-def donothing():
-    
-    popupwin()
+#MENU BAR
+def popup_MUL_eff():
+    VIEWS.SHOW_IMG_MUL_effects(window,SETTINGS)
     return
+def popup_MUL_def():
+    VIEWS.SHOW_IMG_MUL_deform(window,SETTINGS)
+    return
+def popup_MUL_col():
+    VIEWS.SHOW_IMG_MUL_color(window,SETTINGS)
+    return
+def popup_MUL_slices():
+    VIEWS.SHOW_IMG_MUL_slices(window,SETTINGS)
+    return
+def popup_MUL_rot():
+    VIEWS.SHOW_IMG_MUL_rotate(window, SETTINGS)
+    return
+
 menubar = tk.Menu(window)
-filemenu = tk.Menu(menubar, tearoff=0)
-filemenu.add_command(label="MUL_shadow")
-filemenu.add_command(label="MUL_color", command=donothing)
-filemenu.add_command(label="Save", command=donothing)
-filemenu.add_command(label="Save as...", command=donothing)
-filemenu.add_command(label="Close", command=donothing)
-menubar.add_cascade(label="Settings", menu=filemenu)
+MUL_Menu = tk.Menu(menubar, tearoff=0)
+MUL_Menu.add_command(label="IMG_MUL_color",command=popup_MUL_col)
+MUL_Menu.add_command(label="IMG_MUL_effects", command=popup_MUL_eff)
+MUL_Menu.add_command(label="IMG_MUL_rotate", command=popup_MUL_rot)
+MUL_Menu.add_command(label="IMG_MUL_deform", command=popup_MUL_def)
+MUL_Menu.add_command(label="IMG_MUL_slices", command=popup_MUL_slices)
+menubar.add_cascade(label="MULTIPLIER", menu=MUL_Menu)
+
 window.config(menu=menubar)
-
-
-
-
+#DEBUGGGGGG
 
 
 

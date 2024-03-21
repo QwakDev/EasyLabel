@@ -1,3 +1,4 @@
+import tkinter as tk
 # COLOR NAME, BLUE, GREEN, RED
 COLORS = [
 ('grey99',252,252,252),
@@ -238,7 +239,6 @@ COLORS = [
 ('LemonChiffon1',205,250,255),
 ('DarkOrange',0,140,255),
 ('gray54',138,138,138),
-('crymson',60,20,220),
 ('coral2',80,106,238),
 ('DarkOrchid4',139,34,104),
 ('forest green',34,139,34),
@@ -667,7 +667,6 @@ COLORS = [
 ('khaki4',78,134,139),
 ('sienna4',38,71,139),
 ('HotPink4',98,58,139),
-('agua',255,255,0),
 ('misty rose',225,228,255),
 ('DarkTurquoise',209,206,0),
 ('dark orchid',204,50,153),
@@ -767,6 +766,43 @@ class sets:
         self.isHighlighting = False
         self.highlighter_color = 'black'
         self.LABELS_COLORS = []
+#MULTIPLY
+        #COLOR
+        self.MUL_col_solid = setting('color', name='solid_colors')
+        self.MUL_col_solid_random = setting('bool', name='color_solid_random')
+        self.MUL_col_solid_mix = setting('color', name='mix_colors')
+        self.MUL_col_solid_mix_random = setting('bool',name='color_solid_mix_random')
+        self.MUL_col_dif_HSV = setting('colorHSV', name='HSV_change')
+        self.MUL_col_dif_steps = setting('scale',name='HSV_col_dif_steps')
+        #EFFECTS
+        self.MUL_blur = setting('bool',name='blur')
+        self.MUL_blur_random = setting('bool',name='blur_random')
+        self.MUL_shadow = setting('bool',name='shadow')
+        self.MUL_shadow_random = setting('bool',name='shadow_random')
+        self.MUL_noise = setting('bool',name='noise')
+        self.MUL_noise_random = setting('bool',name='random_noise')
+        self.MUL_reflection = setting('bool', name='reflection')
+        #ROTATION
+        self.MUL_rot = setting('scale', name='rotation_angel')
+        self.MUL_rot_mirror = setting('bool',name='rotation_mirror')
+        self.MUL_rot_fX = setting('bool', name='flip X')
+        self.MUL_rot_fY = setting('bool', name='flip Y')
+        #DEFORMATION
+        self.MUL_def_X = setting('scale', name='deformation_X_range')
+        self.MUL_def_Y = setting('scale',name='deformation_Y_range')
+        self.MUL_def_chunks_X_min = setting('scale',name='deformation_chunks_size_x_min')
+        self.MUL_def_chunks_X_max = setting('scale',name='deformation_chunks_size_x_max')
+        self.MUL_def_chunks_Y_min = setting('scale',name='deformation_chunks_size_y_min')
+        self.MUL_def_chunks_Y_max = setting('scale',name='deformation_chunks_size_y_max')
+        #SLICES
+        self.MUL_section_slice_x = setting('scale',name='slice_size_x')
+        self.MUL_section_slice_y = setting('scale',name='slice_size_y')
+#VIDEO
+
+#PREPARATOR
+
+
+
     def set_pen_size(self, size):
         self.pen_size = size
     def get_pen_size(self):
@@ -780,5 +816,134 @@ class sets:
         if self.isHighlighting:
             return self.highlighter_color
         return self.brush_color
-    
+class setting:
+    def __init__(self, set_type='scale', name='_SETTING_NAME_', desc='_description_'):
+        self.value = None
+        self.this_type = set_type
+        self.description = desc
+        self.name = name
+        self.widget = None
+        self.var = None
 
+        self.widget = ''
+        #INIT VALUE structure
+        if self.this_type =='scale':
+            self.value = 0
+        elif self.this_type== 'colorHSV':
+            self.value = [0,0,0]
+        elif self.this_type== 'color':
+            self.value = []
+        elif self.this_type== 'bool':
+            self.value = False
+        else:
+            print('wrong set type!!!')
+    
+    def changeVal(self, e=None):
+        #HSV
+        if isinstance(self.widget, list):
+            self.value[0] = self.widget[0].get()
+            self.value[1] = self.widget[1].get()
+            self.value[2] = self.widget[2].get()
+            return 
+        #WORKING ON THE LIST OF COLORS
+        if self.this_type == 'color':
+            if self.widget.curselection() == ():
+                #CREATING MESSAGE
+                message = ''
+                num = 0
+                for i in self.value:
+                    num+=1
+                    message += str(i)
+                    message += '\r'
+                tk.messagebox.showinfo("CURENT", ("CURENT:"+str(num) + '\r' + message))
+                return
+            else: 
+                #SETTING VALUES SELECTED
+                for sel in self.widget.curselection():
+                    #WHITE SELECTION(REMOVAL)
+                    if self.widget.itemcget(sel,'background') == 'white':
+                        self.value.remove(COLORS[sel])
+                        self.widget.itemconfig(sel, background = COLORS[sel][0], fg='black')
+                        continue
+                    #ELSE: ADDICTION
+                    self.value.append(COLORS[sel])
+                    self.widget.itemconfig(sel, background = 'white', fg='white')
+                self.widget.selection_clear(0, tk.END)
+                #CREATING MESSAGE
+                message = ''
+                num = 0
+                for i in self.value:
+                    num+=1
+                    message += str(i)
+                    message += '\r'
+                tk.messagebox.showinfo("CREATE", ("CREATED:"+str(num) + '\r' + message))
+                return
+        #SLIDER VALUE
+        if type(self.widget.get()) is not type(self.value):
+            print('wrong type to change value')
+            return
+        else:
+            self.value = self.widget.get()
+            return
+    def getWidget(self, win):
+        #SCALE
+        if self.this_type =='scale':
+            name = tk.Label(win, text=self.name)
+            description = tk.Label(win, text=self.description)
+            self.widget = tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal)
+            self.widget.set(self.value)
+            name.pack()
+            self.widget.pack()
+            description.pack()
+        #HSV COLOR or any 3 chanels
+        elif self.this_type== 'colorHSV':
+            name = tk.Label(win, text=self.name)
+            description = tk.Label(win, text=self.description)
+            
+            self.widget= []
+            self.widget.append(tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal))
+            self.widget.append(tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal))
+            self.widget.append(tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal))
+            self.widget[0].set(self.value[0])
+            self.widget[1].set(self.value[1])
+            self.widget[2].set(self.value[2])
+
+            name.pack()
+            self.widget[0].pack()
+            self.widget[1].pack()
+            self.widget[2].pack()
+            description.pack()
+        #COLOR
+        elif self.this_type== 'color':
+            name = tk.Label(win, text=self.name)
+            description = tk.Label(win, text=self.description)
+            btn = tk.Button(win, text='ADD/REMOVE/SHOW', command=self.changeVal)
+            self.widget = tk.Listbox(win, width=70, selectmode='multiple')
+            indx = 0
+            #CREATING LIST
+            for col in COLORS:
+                self.widget.insert(indx, col)
+                found = False
+                #CHECKING IF VALUE EXISTS 
+                for v in self.value:
+                    if v[0] == col[0]:
+                        self.widget.itemconfig(indx, background = 'white', fg='white')
+                        found = True
+                        break
+                if not found:
+                    self.widget.itemconfig(indx, background = col[0])
+                indx = indx + 1
+            name.pack()
+            self.widget.pack()
+            description.pack()
+            btn.pack()
+        #CHECKBOX
+        elif self.this_type== 'bool':
+            description = tk.Label(win, text=self.description)
+            var = tk.BooleanVar(value=self.value)
+            self.widget = tk.Checkbutton(win,text=self.name,variable=var, onvalue=True, offvalue=False, command=self.changeVal)
+            self.widget.pack()
+            self.widget = var
+            description.pack()
+        else:
+            print('wrong set type!!!')
