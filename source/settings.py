@@ -1,4 +1,5 @@
 import tkinter as tk
+import pickle
 # COLOR NAME, BLUE, GREEN, RED
 COLORS = [
 ('grey99',252,252,252),
@@ -947,3 +948,70 @@ class setting:
             description.pack()
         else:
             print('wrong set type!!!')
+
+def GET_SAVE_sets(sets):
+        save_items = [
+            #COLOR
+            sets.MUL_col_solid.value,
+            sets.MUL_col_solid_random.value,
+            sets.MUL_col_solid_mix.value,
+            sets.MUL_col_solid_mix_random.value,
+            sets.MUL_col_dif_HSV.value,
+            sets.MUL_col_dif_steps.value,
+            #EFFECTS
+            sets.MUL_blur.value,
+            sets.MUL_blur_random.value,
+            sets.MUL_shadow.value,
+            sets.MUL_shadow_random.value,
+            sets.MUL_noise.value,
+            sets.MUL_noise_random.value,
+            sets.MUL_reflection.value,
+            #ROTATION
+            sets.MUL_rot.value,
+            sets.MUL_rot_mirror.value,
+            sets.MUL_rot_fX.value,
+            sets.MUL_rot_fY.value,
+            #DEFORMATION
+            sets.MUL_def_X.value,
+            sets.MUL_def_Y.value,
+            sets.MUL_def_chunks_X_min.value,
+            sets.MUL_def_chunks_X_max.value,
+            sets.MUL_def_chunks_Y_min.value,
+            sets.MUL_def_chunks_Y_max.value,
+            #SLICES
+            sets.MUL_section_slice_x.value,
+            sets.MUL_section_slice_y.value
+        ]
+        return save_items
+def READ_sets(data):
+    out = sets()
+    out.MUL_col_solid.value = data[0]
+    out.MUL_col_solid_random.value= data[1]
+    out.MUL_col_solid_mix.value= data[2]
+    out.MUL_col_solid_mix_random.value= data[3]
+    out.MUL_col_dif_HSV.value= data[4]
+    out.MUL_col_dif_steps.value= data[5]
+    #EFFECTS
+    out.MUL_blur.value= data[6]
+    out.MUL_blur_random.value= data[7]
+    out.MUL_shadow.value= data[8]
+    out.MUL_shadow_random.value= data[9]
+    out.MUL_noise.value= data[10]
+    out.MUL_noise_random.value= data[11]
+    out.MUL_reflection.value= data[12]
+    #ROTATION
+    out.MUL_rot.value= data[13]
+    out.MUL_rot_mirror.value= data[14]
+    out.MUL_rot_fX.value= data[15]
+    out.MUL_rot_fY.value= data[16]
+    #DEFORMATION
+    out.MUL_def_X.value= data[17]
+    out.MUL_def_Y.value= data[18]
+    out.MUL_def_chunks_X_min.value= data[19]
+    out.MUL_def_chunks_X_max.value= data[20]
+    out.MUL_def_chunks_Y_min.value= data[21]
+    out.MUL_def_chunks_Y_max.value= data[22]
+    #SLICES
+    out.MUL_section_slice_x.value= data[23]
+    out.MUL_section_slice_y.value= data[24]
+    return out

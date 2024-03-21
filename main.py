@@ -1,8 +1,9 @@
 import cv2 as cv
+import pickle
 import tkinter as tk
 from source.pen import DrawingCanvas
 import source.files as FILE
-from source.settings import sets, COLORS
+from source.settings import sets, COLORS, GET_SAVE_sets, READ_sets
 import time
 import random
 import source.IMG_PROCESSING.seperator as SEPARATOR
@@ -114,8 +115,7 @@ def btn_highlight_click():
     return
 def btn_multi_click():
     return
-def btn_debug_click():
-    print('DEBUG:')
+
     
 ##VIEWS
 window.title("EasyLoop App")
@@ -124,9 +124,7 @@ window.geometry('1200x650')
 frame_options = tk.Frame(window)
 frame_right = tk.Frame(window)
 frame_main = tk.Frame(window)
-#DEBUG
-btn_debug = tk.Button(frame_options,text='DEBUG',command=btn_debug_click)
-btn_debug.pack(side='left')
+
 
 frame_right.pack(side='right')
 frame_main.pack(side='top')
@@ -216,8 +214,24 @@ def popup_MUL_slices():
 def popup_MUL_rot():
     VIEWS.SHOW_IMG_MUL_rotate(window, SETTINGS)
     return
-
+def save_SETTINGS():
+    global SETTINGS
+    #SAVE
+    path = tk.filedialog.asksaveasfilename(confirmoverwrite=False, defaultextension='.pkl')
+    with open(path, 'wb') as out:
+        data = GET_SAVE_sets(SETTINGS)
+        pickle.dump(data, out, pickle.HIGHEST_PROTOCOL)
+    return
+def load_SETTINGS():
+    global SETTINGS
+    path = tk.filedialog.askopenfilename(filetypes=[('save files','*.pkl')])
+    data = None
+    with open(path, 'rb') as d:
+        data = pickle.load(d)
+    SETTINGS = READ_sets(data)
+    return
 menubar = tk.Menu(window)
+
 MUL_Menu = tk.Menu(menubar, tearoff=0)
 MUL_Menu.add_command(label="IMG_MUL_color",command=popup_MUL_col)
 MUL_Menu.add_command(label="IMG_MUL_effects", command=popup_MUL_eff)
@@ -226,10 +240,20 @@ MUL_Menu.add_command(label="IMG_MUL_deform", command=popup_MUL_def)
 MUL_Menu.add_command(label="IMG_MUL_slices", command=popup_MUL_slices)
 menubar.add_cascade(label="MULTIPLIER", menu=MUL_Menu)
 
+SAVE_SETS_Menu = tk.Menu(menubar, tearoff=0)
+menubar.add_cascade(label="SAVE_SETTINGS", command=save_SETTINGS)
+LOAD_SETS_Menu = tk.Menu(menubar, tearoff=0)
+menubar.add_cascade(label="LOAD_SETTINGS", command=load_SETTINGS)
+
 window.config(menu=menubar)
 #DEBUGGGGGG
+def btn_debug_click():
+    return
 
-
-
+#DEBUG
+btn_debug = tk.Button(frame_options,text='DEBUG',command=btn_debug_click)
+btn_debug.pack(side='left')
 #END OF DEBUUUG
 window.mainloop()
+
+
