@@ -552,4 +552,15 @@ def GET_noise(img, mask, whites = False):
 
     out = cv.add(bg,fg.astype('uint8'))
     return out
-
+def GET_quant(img,clusters, k=2):
+    Z = img.reshape((-1,3))
+    # convert to np.float32
+    Z = np.float32(Z)
+                #( type, max_iter = 10 , epsilon = 1.0 )
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    ret,label,center=cv.kmeans(Z,k,None,criteria,clusters,cv.KMEANS_RANDOM_CENTERS)
+    #CONVERTING TO uint8 img
+    center = np.uint8(center)
+    res = center[label.flatten()]
+    res2 = res.reshape((img.shape))
+    return res2

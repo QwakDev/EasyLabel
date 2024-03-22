@@ -7,13 +7,19 @@ def SHOW_IMG_MUL_color(window,sets):
     popup= tk.Toplevel(window)
     popup.title('COLORS')
     popup.geometry(_GEOMETRY)
+    #scrollbar = tk.Scrollbar(popup)
+    #scrollbar.pack( side = 'right', fill=tk.Y, command=popup.yview )
 
     sets.MUL_col_solid.getWidget(popup)
     sets.MUL_col_solid_random.getWidget(popup)
-    sets.MUL_col_solid_mix.getWidget(popup)
+    #sets.MUL_col_solid_mix.getWidget(popup)
     sets.MUL_col_solid_mix_random.getWidget(popup)
     sets.MUL_col_dif_HSV.getWidget(popup)
     sets.MUL_col_dif_steps.getWidget(popup)
+    sets.MUL_col_quant_k.getWidget(popup)
+    sets.MUL_col_quant_cluster.getWidget(popup)
+
+
     return
 def SHOW_IMG_MUL_effects(window,sets):
     popup= tk.Toplevel(window)

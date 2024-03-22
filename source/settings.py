@@ -776,6 +776,8 @@ class sets:
         self.MUL_col_solid_mix_random = setting('bool',name='color_solid_mix_random')
         self.MUL_col_dif_HSV = setting('colorHSV', name='HSV_change')
         self.MUL_col_dif_steps = setting('scale',name='HSV_col_dif_steps')
+        self.MUL_col_quant_k = setting('scale', name='Quantization_K')
+        self.MUL_col_quant_cluster = setting('scale', name='Quantization_clusters')
         #EFFECTS
         self.MUL_blur = setting('bool',name='blur')
         self.MUL_blur_random = setting('bool',name='blur_random')
@@ -839,7 +841,9 @@ class setting:
             self.value = False
         else:
             print('wrong set type!!!')
-    
+    def showDescription(self):
+        tk.messagebox.showinfo("DESCRIPTION", ("DESCRIPTION: "+self.description))
+        return
     def changeVal(self, e=None):
         #HSV
         if isinstance(self.widget, list):
@@ -890,17 +894,21 @@ class setting:
     def getWidget(self, win):
         #SCALE
         if self.this_type =='scale':
-            name = tk.Label(win, text=self.name)
-            description = tk.Label(win, text=self.description)
-            self.widget = tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal)
+            f = tk.Frame(win)
+            name = tk.Button(f,width=25, text=self.name)
+            des_btn = tk.Button(f,width=5, text='HELP', command=self.showDescription)
+            self.widget = tk.Scale(f,length=500, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal)
             self.widget.set(self.value)
-            name.pack()
-            self.widget.pack()
-            description.pack()
+
+            f.pack()
+            des_btn.pack(side = tk.RIGHT)
+            self.widget.pack(side = tk.RIGHT)
+            name.pack(side = tk.RIGHT)
         #HSV COLOR or any 3 chanels
         elif self.this_type== 'colorHSV':
-            name = tk.Label(win, text=self.name)
-            description = tk.Label(win, text=self.description)
+            f = tk.Frame(win)
+            name = tk.Button(f, text=self.name)
+            des_btn = tk.Button(f,width=5, text='HELP', command=self.showDescription)
             
             self.widget= []
             self.widget.append(tk.Scale(win,length=750, from_=0, to=255,orient=tk.HORIZONTAL, command=self.changeVal))
@@ -910,11 +918,13 @@ class setting:
             self.widget[1].set(self.value[1])
             self.widget[2].set(self.value[2])
 
-            name.pack()
+            f.pack()
+            des_btn.pack(side=tk.RIGHT)
+            name.pack(side=tk.RIGHT)
             self.widget[0].pack()
             self.widget[1].pack()
             self.widget[2].pack()
-            description.pack()
+
         #COLOR
         elif self.this_type== 'color':
             name = tk.Label(win, text=self.name)
@@ -941,12 +951,19 @@ class setting:
             btn.pack()
         #CHECKBOX
         elif self.this_type== 'bool':
-            description = tk.Label(win, text=self.description)
+            f = tk.Frame(win)
+            name = tk.Button(f, text=self.name, width=50)
+            des_btn = tk.Button(f, text='HELP',command=self.showDescription)
+
             var = tk.BooleanVar(value=self.value)
-            self.widget = tk.Checkbutton(win,text=self.name,variable=var, onvalue=True, offvalue=False, command=self.changeVal)
-            self.widget.pack()
+            self.widget = tk.Checkbutton(f,variable=var, onvalue=True, offvalue=False, command=self.changeVal)
+            
+            f.pack()
+            des_btn.pack(side=tk.RIGHT)
+            self.widget.pack(side=tk.RIGHT)
+            name.pack(side=tk.RIGHT)
+
             self.widget = var
-            description.pack()
         else:
             print('wrong set type!!!')
 
@@ -981,7 +998,10 @@ def GET_SAVE_sets(sets):
             sets.MUL_def_chunks_Y_max.value,
             #SLICES
             sets.MUL_section_slice_x.value,
-            sets.MUL_section_slice_y.value
+            sets.MUL_section_slice_y.value,
+            #OTHERS
+            sets.MUL_col_quant_k.value,
+            sets.MUL_col_quant_cluster.value
         ]
         return save_items
 def READ_sets(data):
@@ -1015,4 +1035,7 @@ def READ_sets(data):
     #SLICES
     out.MUL_section_slice_x.value= data[23]
     out.MUL_section_slice_y.value= data[24]
+
+    out.MUL_col_quant_k.value = data[25]
+    out.MUL_col_quant_cluster.value= data[26]
     return out
